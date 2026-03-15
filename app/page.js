@@ -491,10 +491,10 @@ export default function Home() {
                 className={`flex items-center gap-3 h-11 px-4 border transition-all outline-none rounded-2xl ${showUserMenu ? 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm' : 'border-transparent hover:bg-white dark:hover:bg-zinc-900'}`}
               >
                 <div className="w-7 h-7 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-[10px] font-light text-white dark:text-zinc-900 uppercase">
-                  {user?.username[0]}
+                  {user?.email[0]}
                 </div>
                 <div className="text-left hidden xl:block">
-                   <p className="text-xs font-light leading-none">{user?.username}</p>
+                   <p className="text-xs font-light leading-none">{user?.email.split('@')[0]}</p>
                    <p className="text-[10px] text-zinc-500 font-light uppercase mt-1">
                      {user?.role === 'superadmin' ? 'Sistemas' : 'Cliente'}
                    </p>
@@ -508,10 +508,10 @@ export default function Home() {
                     <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-2">Identidad</p>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-xs font-light">
-                        {user?.username[0].toUpperCase()}
+                        {user?.email[0].toUpperCase()}
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-sm font-light truncate max-w-[140px]">{user?.username}</p>
+                        <p className="text-sm font-light truncate max-w-[140px]">{user?.email}</p>
                         <p className="text-[10px] text-zinc-500 font-light uppercase">{usage?.user?.plan || 'Free'} Plan</p>
                       </div>
                     </div>
@@ -559,7 +559,7 @@ export default function Home() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50">
-                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Empresa / Usuario</th>
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Identidad Corporativa</th>
                       <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Plan Actual</th>
                       <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Uso de Cuota</th>
                       <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Créditos / Pago</th>
@@ -571,8 +571,8 @@ export default function Home() {
                     {adminUsers.map(u => (
                       <tr key={u.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30 transition-colors">
                         <td className="px-6 py-4">
-                          <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{u.username}</p>
-                          <p className="text-[10px] text-zinc-400">{u.email}</p>
+                          <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{u.email}</p>
+                          <p className="text-[10px] text-zinc-400 font-mono italic">Acceso Verificado</p>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${u.plan === 'ENTERPRISE' ? 'bg-zinc-800 text-zinc-100' : u.plan === 'PROFESSIONAL' ? 'bg-blue-100 text-blue-700' : 'bg-zinc-100 text-zinc-600'}`}>

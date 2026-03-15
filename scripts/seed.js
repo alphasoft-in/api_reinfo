@@ -8,23 +8,22 @@ async function seed() {
         await initDb();
         console.log('OK: Tables initialized.');
 
-        const adminUsername = 'admin';
-        const adminUser = await getUserByUsername(adminUsername);
+        const adminEmail = 'admin@reinfo.pe';
+        const adminUser = await getUserByEmail(adminEmail);
         
         if (!adminUser) {
-            console.log(`Creating admin user: ${adminUsername}...`);
+            console.log(`Creating admin user: ${adminEmail}...`);
             const hashedPassword = await bcrypt.hash('admin123', 10);
             
             await createUser({
-                username: adminUsername,
+                email: adminEmail,
                 password: hashedPassword,
-                email: 'admin@reinfo.pe',
                 role: 'user',
                 plan: 'BASIC',
                 quota_limit: 100
             });
             
-            console.log('👤 Admin user created: admin / admin123');
+            console.log('👤 Admin user created: admin@reinfo.pe / admin123');
         } else {
             console.log('INFO: Admin user already exists.');
         }
