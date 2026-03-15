@@ -688,9 +688,9 @@ export default function Home() {
                      </h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                           <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Usuario</label>
+                           <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Email Corporativo</label>
                            <div className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light flex items-center">
-                              {user?.username}
+                              {user?.email || user?.username}
                            </div>
                         </div>
                         <div className="space-y-2">
