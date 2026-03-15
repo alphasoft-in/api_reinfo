@@ -72,11 +72,9 @@ export async function GET(request) {
         const filteredCount = await countRegistros(filter);
         const stats = await getStats();
 
-        // Perform Logging and Quota Update if Search happened (any search)
-        if (ruc || name || codigoUnico) {
-            await updateQuota(user.id);
-            if (ruc) await logConsulta(user.id, ruc);
-        }
+        // Perform Logging and Quota Update for any data retrieval
+        await updateQuota(user.id);
+        if (ruc) await logConsulta(user.id, ruc);
 
         return NextResponse.json({
             success: true,

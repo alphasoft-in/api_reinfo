@@ -42,6 +42,7 @@ export default function Home() {
   const [loginError, setLoginError] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isValidatingSession, setIsValidatingSession] = useState(true);
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     checkSession();
@@ -71,11 +72,17 @@ export default function Home() {
   useEffect(() => {
     if (isLoggedIn) {
       fetchStats();
-      fetchData();
       fetchUsage();
       if (user?.role === 'superadmin') fetchAdminUsers();
+      
+      // Only fetch data if we have a query or have already searched/requested browsing
+      if (query || hasSearched) {
+        fetchData();
+      } else {
+        setData([]); // Ensure clean state if not searching
+      }
     }
-  }, [isLoggedIn, page, activeTab]);
+  }, [isLoggedIn, page, activeTab, hasSearched]);
 
   const fetchAdminUsers = async () => {
     try {
@@ -212,7 +219,16 @@ export default function Home() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
+    setHasSearched(true);
     fetchData();
+  };
+
+  const handleBrowseAll = () => {
+    if (confirm("Al cargar todos los registros se descontará 1 crédito de tu cuota. ¿Deseas continuar?")) {
+      setPage(1);
+      setHasSearched(true);
+      fetchData();
+    }
   };
 
   if (isValidatingSession) {
@@ -857,7 +873,27 @@ export default function Home() {
                       </td>
                     </tr>
                   ) : data.length === 0 ? (
-                    <tr><td colSpan="5" className="py-24 text-center text-zinc-400 text-sm font-light">No se han encontrado registros.</td></tr>
+                    <tr>
+                      <td colSpan="5" className="py-32 text-center">
+                        <div className="max-w-sm mx-auto space-y-4">
+                          <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <Search className="w-8 h-8 text-zinc-300" />
+                          </div>
+                          <h3 className="text-lg font-light text-zinc-900 dark:text-zinc-100 italic">Listo para Consultar</h3>
+                          <p className="text-sm text-zinc-400 font-light leading-relaxed">
+                            Ingresa un RUC o Nombre en la barra superior para buscar un minero específico.
+                          </p>
+                          <div className="pt-4">
+                            <button 
+                              onClick={handleBrowseAll}
+                              className="text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-all underline underline-offset-4"
+                            >
+                              O explorar todos los registros (1 crédito)
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
                   ) : data.map((item) => (
                     <tr key={item.numero} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors group">
                       <td className="px-6 py-4.5 text-[10px] font-mono text-zinc-300 text-center font-light italic">{item.numero}</td>
