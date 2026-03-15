@@ -1001,125 +1001,127 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Master Table */}
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-            <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40">
-               <div className="flex items-center gap-2">
-                 <Filter className="w-4 h-4 text-zinc-400" />
-                 <h2 className="text-sm font-light tracking-normal text-zinc-600 dark:text-zinc-300 uppercase">Listado de Operadores</h2>
-               </div>
-               <div className="text-[11px] font-light text-zinc-400 uppercase tracking-widest italic opacity-50">Sincronizado hace 2m</div>
-            </div>
-            
-            <div className="overflow-x-auto flex-1">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                    <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider w-12 text-center">N°</th>
-                    <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Titular de Operación</th>
-                    <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Derecho Minero</th>
-                    <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Localización</th>
-                    <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider text-center">Situación</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {loading ? (
-                    <tr>
-                      <td colSpan="5" className="py-32 text-center text-zinc-400">
-                        <RefreshCw className="w-10 h-10 animate-spin mx-auto mb-4 opacity-10" />
-                        <span className="text-sm font-light uppercase tracking-widest opacity-40">Consultando Base de Datos...</span>
-                      </td>
+          {/* Master Table - Hidden for regular users until they search */}
+          {(user?.role === 'superadmin' || hasSearched) && (
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-zinc-400" />
+                  <h2 className="text-sm font-light tracking-normal text-zinc-600 dark:text-zinc-300 uppercase">Listado de Operadores</h2>
+                </div>
+                <div className="text-[11px] font-light text-zinc-400 uppercase tracking-widest italic opacity-50">Sincronizado hace 2m</div>
+              </div>
+              
+              <div className="overflow-x-auto flex-1">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-zinc-100 dark:border-zinc-800">
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider w-12 text-center">N°</th>
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Titular de Operación</th>
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Derecho Minero</th>
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider">Localización</th>
+                      <th className="px-6 py-4 text-[11px] font-light text-zinc-400 uppercase tracking-wider text-center">Situación</th>
                     </tr>
-                  ) : data.length === 0 ? (
-                    <tr>
-                      <td colSpan="5" className="py-32 text-center">
-                        <div className="max-w-sm mx-auto space-y-4">
-                          <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                            <Search className="w-8 h-8 text-zinc-300" />
-                          </div>
-                          <h3 className="text-lg font-light text-zinc-900 dark:text-zinc-100 italic">Listo para Consultar</h3>
-                          <p className="text-sm text-zinc-400 font-light leading-relaxed">
-                            Ingresa un RUC o Nombre en la barra superior para buscar un minero específico.
-                          </p>
-                          {user?.role === 'superadmin' && (
-                            <div className="pt-4">
-                              <button 
-                                onClick={handleBrowseAll}
-                                className="text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-all underline underline-offset-4"
-                                >
-                                O explorar todos los registros (1 crédito)
-                              </button>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    {loading ? (
+                      <tr>
+                        <td colSpan="5" className="py-32 text-center text-zinc-400">
+                          <RefreshCw className="w-10 h-10 animate-spin mx-auto mb-4 opacity-10" />
+                          <span className="text-sm font-light uppercase tracking-widest opacity-40">Consultando Base de Datos...</span>
+                        </td>
+                      </tr>
+                    ) : data.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="py-32 text-center">
+                          <div className="max-w-sm mx-auto space-y-4">
+                            <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                              <Search className="w-8 h-8 text-zinc-300" />
                             </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ) : data.map((item) => (
-                    <tr key={item.numero} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors group">
-                      <td className="px-6 py-4.5 text-[10px] font-mono text-zinc-300 text-center font-light italic">{item.numero}</td>
-                      <td className="px-6 py-4.5">
-                        <div className="font-light text-[13px] tracking-normal group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors cursor-default">{item.minero}</div>
-                        <div className="text-[11px] font-light text-zinc-400 mt-1 uppercase tracking-widest flex items-center gap-1.5">
-                          RUC {item.ruc}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4.5">
-                        <div className="text-[12px] font-light text-zinc-700 dark:text-zinc-300 mb-0.5">{item.nombreDerecho || 'NO REPORTADO'}</div>
-                        <div className="text-[11px] text-zinc-400 tracking-normaler uppercase">{item.codigoUnico}</div>
-                      </td>
-                      <td className="px-6 py-4.5">
-                        <div className="text-[11px] font-light uppercase tracking-normal text-zinc-600 dark:text-zinc-400">{item.departamento} • {item.provincia}</div>
-                        <div className="text-[11px] text-zinc-400 font-light mt-0.5">{item.distrito}</div>
-                      </td>
-                      <td className="px-6 py-4.5 text-center">
-                        <span className={`inline-flex items-center px-4 py-1 rounded-lg text-[9px] font-light uppercase tracking-widest border transition-all ${
-                          item.estado === 'VIGENTE' 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/20 shadow-sm shadow-emerald-500/5' 
-                            : 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/20 shadow-sm shadow-red-500/5'
-                        }`}>
-                          <div className={`w-1.5 h-1.5 rounded-full mr-2 ${item.estado === 'VIGENTE' ? 'bg-emerald-500' : 'bg-red-500'} animate-pulse`} />
-                          {item.estado}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                            <h3 className="text-lg font-light text-zinc-900 dark:text-zinc-100 italic">Listo para Consultar</h3>
+                            <p className="text-sm text-zinc-400 font-light leading-relaxed">
+                              Ingresa un RUC o Nombre en la barra superior para buscar un minero específico.
+                            </p>
+                            {user?.role === 'superadmin' && (
+                              <div className="pt-4">
+                                <button 
+                                  onClick={handleBrowseAll}
+                                  className="text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-all underline underline-offset-4"
+                                  >
+                                  O explorar todos los registros (1 crédito)
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : data.map((item) => (
+                      <tr key={item.numero} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30 transition-colors group">
+                        <td className="px-6 py-4.5 text-[10px] font-mono text-zinc-300 text-center font-light italic">{item.numero}</td>
+                        <td className="px-6 py-4.5">
+                          <div className="font-light text-[13px] tracking-normal group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors cursor-default">{item.minero}</div>
+                          <div className="text-[11px] font-light text-zinc-400 mt-1 uppercase tracking-widest flex items-center gap-1.5">
+                            RUC {item.ruc}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4.5">
+                          <div className="text-[12px] font-light text-zinc-700 dark:text-zinc-300 mb-0.5">{item.nombreDerecho || 'NO REPORTADO'}</div>
+                          <div className="text-[11px] text-zinc-400 tracking-normaler uppercase">{item.codigoUnico}</div>
+                        </td>
+                        <td className="px-6 py-4.5">
+                          <div className="text-[11px] font-light uppercase tracking-normal text-zinc-600 dark:text-zinc-400">{item.departamento} • {item.provincia}</div>
+                          <div className="text-[11px] text-zinc-400 font-light mt-0.5">{item.distrito}</div>
+                        </td>
+                        <td className="px-6 py-4.5 text-center">
+                          <span className={`inline-flex items-center px-4 py-1 rounded-lg text-[9px] font-light uppercase tracking-widest border transition-all ${
+                            item.estado === 'VIGENTE' 
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/20 shadow-sm shadow-emerald-500/5' 
+                              : 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/20 shadow-sm shadow-red-500/5'
+                          }`}>
+                            <div className={`w-1.5 h-1.5 rounded-full mr-2 ${item.estado === 'VIGENTE' ? 'bg-emerald-500' : 'bg-red-500'} animate-pulse`} />
+                            {item.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Pagination Controls */}
-            <div className="px-8 py-5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/20 shrink-0">
-               <p className="text-[11px] text-zinc-500 font-light uppercase tracking-wider">
-                 Página <span className="text-zinc-900 dark:text-zinc-100">{page}</span> de <span className="text-zinc-400">{totalPages}</span>
-               </p>
-               <div className="flex items-center gap-2">
-                 <button 
-                  disabled={page === 1} onClick={() => setPage(p => p - 1)}
-                  className="h-9 px-4 text-[10px] font-light flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 transition-all uppercase tracking-widest"
-                 >
-                   <ChevronLeft className="w-4 h-4" /> Anterior
-                 </button>
-                 
-                 <div className="flex gap-1">
-                    {[...Array(Math.min(3, totalPages))].map((_, i) => {
-                      const p = i + 1;
-                      return (
-                        <button key={p} onClick={() => setPage(p)} className={`w-9 h-9 flex items-center justify-center text-[11px] font-light rounded-xl transition-all ${page === p ? 'bg-zinc-800 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}>
-                          {p}
-                        </button>
-                      )
-                    })}
-                 </div>
+              {/* Pagination Controls */}
+              <div className="px-8 py-5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/20 shrink-0">
+                <p className="text-[11px] text-zinc-500 font-light uppercase tracking-wider">
+                  Página <span className="text-zinc-900 dark:text-zinc-100">{page}</span> de <span className="text-zinc-400">{totalPages}</span>
+                </p>
+                <div className="flex items-center gap-2">
+                  <button 
+                    disabled={page === 1} onClick={() => setPage(p => p - 1)}
+                    className="h-9 px-4 text-[10px] font-light flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 transition-all uppercase tracking-widest"
+                  >
+                    <ChevronLeft className="w-4 h-4" /> Anterior
+                  </button>
+                  
+                  <div className="flex gap-1">
+                      {[...Array(Math.min(3, totalPages))].map((_, i) => {
+                        const p = i + 1;
+                        return (
+                          <button key={p} onClick={() => setPage(p)} className={`w-9 h-9 flex items-center justify-center text-[11px] font-light rounded-xl transition-all ${page === p ? 'bg-zinc-800 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}>
+                            {p}
+                          </button>
+                        )
+                      })}
+                  </div>
 
-                 <button 
-                  disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
-                  className="h-9 px-5 text-[10px] font-light flex items-center gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl hover:opacity-95 disabled:opacity-30 transition-all uppercase tracking-widest shadow-lg shadow-zinc-900/10 dark:shadow-none"
-                 >
-                   Siguiente <ChevronRight className="w-4 h-4" />
-                 </button>
-               </div>
+                  <button 
+                    disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+                    className="h-9 px-5 text-[10px] font-light flex items-center gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl hover:opacity-95 disabled:opacity-30 transition-all uppercase tracking-widest shadow-lg shadow-zinc-900/10 dark:shadow-none"
+                  >
+                    Siguiente <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>
