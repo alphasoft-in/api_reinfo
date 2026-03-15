@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { authenticator } from 'otplib';
+import { verifySync } from 'otplib';
 import { getUserById, enableUser2FA } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 
@@ -25,7 +25,7 @@ export async function POST(request) {
         }
 
         // Verify the code
-        const isValid = authenticator.verify({
+        const isValid = verifySync({
             token: code,
             secret: user.two_factor_secret
         });

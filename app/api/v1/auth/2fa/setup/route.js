@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { authenticator } from 'otplib';
+import { generateSecret, generateURI } from 'otplib';
 import QRCode from 'qrcode';
 import { setUser2FASecret } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
@@ -23,13 +23,13 @@ export async function POST(request) {
         const userEmail = decoded.email || 'user@reinfo.pro'; // Fallback if email not in token
 
         // Generate a new secret
-        const secret = authenticator.generateSecret();
+        const secret = generateSecret();
         
         // Save temporary secret (optionally encrypted, but for now just saving)
         await setUser2FASecret(userId, secret);
 
         // Generate OTP Auth URL
-        const otpauth = authenticator.keyuri(userEmail, 'REINFO Pro', secret);
+        const otpauth = generateURI({ issuer: 'REINFO Pro', label: userEmail, secret });
         
         // Generate Data URL for QR Code
         const qrCodeDataUrl = await QRCode.toDataURL(otpauth);
