@@ -32,7 +32,7 @@ export async function POST(request) {
             );
         }
 
-        let quota_limit = 100;
+        let quota_limit = 10;
         if (plan === 'PROFESSIONAL') quota_limit = 10000;
         if (plan === 'ENTERPRISE') quota_limit = 1000000;
 
