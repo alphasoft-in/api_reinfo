@@ -57,6 +57,10 @@ export async function GET(request) {
 
     try {
         const { searchParams } = new URL(request.url);
+        const ruc = searchParams.get('ruc');
+        const name = searchParams.get('name');
+        const codigoUnico = searchParams.get('codigoUnico');
+        const status = searchParams.get('status');
         const limit = parseInt(searchParams.get('limit')) || 25;
         const offset = parseInt(searchParams.get('offset')) || 0;
 
