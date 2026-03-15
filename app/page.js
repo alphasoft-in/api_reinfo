@@ -193,7 +193,7 @@ export default function Home() {
       });
       if (res.data.success) {
         setIsRegistering(false);
-        setLoginError("Registro exitoso. Por favor inicie sesión.");
+        setLoginError("Registro corporativo exitoso. Por seguridad, configure la autenticación de 2 pasos en su perfil tras ingresar.");
       }
     } catch (err) {
       setLoginError(err.response?.data?.message || "Error al registrar.");
@@ -542,6 +542,25 @@ export default function Home() {
 
         {/* Dynamic Viewport */}
         <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 custom-scrollbar">
+          {!usage?.user?.two_factor_enabled && !user?.two_factor_enabled && (
+            <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-700">
+               <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                     <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                     <p className="text-sm font-light text-blue-900 dark:text-blue-100">Seguridad: Active la Autenticación en 2 Pasos</p>
+                     <p className="text-xs text-blue-600/80 dark:text-blue-400/60 font-light">Proteja su acceso corporativo y datos sensibles configurando un token de seguridad.</p>
+                  </div>
+               </div>
+               <button 
+                 onClick={() => setActiveTab('settings')}
+                 className="px-4 py-2 bg-blue-600 text-white text-[10px] font-light rounded-xl hover:bg-blue-700 transition-all uppercase tracking-widest"
+               >
+                 Configurar Ahora
+               </button>
+            </div>
+          )}
           {activeTab === 'admin' ? (
             <div className="space-y-8">
               <div className="flex items-center justify-between">

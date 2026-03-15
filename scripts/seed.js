@@ -8,25 +8,9 @@ async function seed() {
         await initDb();
         console.log('OK: Tables initialized.');
 
-        const adminEmail = 'admin@reinfo.pe';
-        const adminUser = await getUserByEmail(adminEmail);
-        
-        if (!adminUser) {
-            console.log(`Creating admin user: ${adminEmail}...`);
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            
-            await createUser({
-                email: adminEmail,
-                password: hashedPassword,
-                role: 'user',
-                plan: 'BASIC',
-                quota_limit: 100
-            });
-            
-            console.log('👤 Admin user created: admin@reinfo.pe / admin123');
-        } else {
-            console.log('INFO: Admin user already exists.');
-        }
+        // In real data mode, we only initialize tables.
+        // Seeding users is removed to ensure only real company data is used.
+        console.log('INFO: Infrastructure ready for real data.');
     } catch (error) {
         console.error('FAIL: Seed failed:', error);
     }
