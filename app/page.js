@@ -22,7 +22,8 @@ import {
   Zap,
   Users,
   AlertCircle,
-  Settings
+  Settings,
+  ShieldCheck
 } from "lucide-react";
 import axios from "axios";
 
@@ -1006,9 +1007,9 @@ export default function Home() {
             ) : (
               // Case 2: Client (Personal Consumption Only)
               [
-                { label: "Consultas Realizadas", value: usage.quota_used, color: "text-zinc-900 dark:text-white", icon: RefreshCw, unit: "Búsquedas" },
-                { label: "Créditos Disponibles", value: Math.max(0, usage.quota_limit - usage.quota_used), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
-                { label: "Créditos del Plan", value: usage.quota_limit, color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage.plan },
+                { label: "Consultas Realizadas", value: usage?.quota_used || 0, color: "text-zinc-900 dark:text-white", icon: RefreshCw, unit: "Búsquedas" },
+                { label: "Créditos Disponibles", value: Math.max(0, (usage?.quota_limit || 0) - (usage?.quota_used || 0)), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
+                { label: "Créditos del Plan", value: usage?.quota_limit || usage?.plan || "FREE", color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage?.plan || "Nivel" },
               ].map((stat, i) => (
                 <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
                   <div>
