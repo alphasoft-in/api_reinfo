@@ -35,7 +35,8 @@ export async function GET(request) {
                 plan: user.plan,
                 quota_limit: user.quota_limit,
                 quota_used: user.quota_used,
-                subscription_end: user.subscription_end
+                subscription_end: user.subscription_end,
+                two_factor_enabled: user.two_factor_enabled
             },
             analytics: {
                 topRucs

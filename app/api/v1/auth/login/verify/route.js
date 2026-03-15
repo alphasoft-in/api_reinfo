@@ -49,7 +49,8 @@ export async function POST(request) {
                 quota: {
                     limit: user.quota_limit,
                     used: user.quota_used
-                }
+                },
+                two_factor_enabled: user.two_factor_enabled
             }
         });
 
