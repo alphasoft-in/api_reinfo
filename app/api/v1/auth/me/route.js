@@ -26,6 +26,7 @@ export async function GET() {
             success: true,
             user: {
                 username: user.username,
+                email: user.email,
                 role: user.role,
                 apiKey: user.api_key,
                 quota: {

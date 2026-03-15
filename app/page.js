@@ -508,11 +508,11 @@ export default function Home() {
                     <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-2">Identidad</p>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-xs font-light">
-                        {user?.email[0].toUpperCase()}
+                        {user?.email?.[0].toUpperCase() || 'U'}
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-sm font-light truncate max-w-[140px]">{user?.email}</p>
-                        <p className="text-[10px] text-zinc-500 font-light uppercase">{usage?.user?.plan || 'Free'} Plan</p>
+                        <p className="text-sm font-light truncate max-w-[140px]">{user?.email || 'Sesión Activa'}</p>
+                        <p className="text-[10px] text-zinc-500 font-light uppercase">{usage?.user?.plan || user?.plan || 'Free'} Plan</p>
                       </div>
                     </div>
                   </div>
@@ -590,7 +590,7 @@ export default function Home() {
                     {adminUsers.map(u => (
                       <tr key={u.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30 transition-colors">
                         <td className="px-6 py-4">
-                          <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{u.email}</p>
+                          <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{u.email || u.username}</p>
                           <p className="text-[10px] text-zinc-400 font-mono italic">Acceso Verificado</p>
                         </td>
                         <td className="px-6 py-4">
