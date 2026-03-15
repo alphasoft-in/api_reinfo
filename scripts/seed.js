@@ -19,8 +19,9 @@ async function seed() {
                 username: adminUsername,
                 password: hashedPassword,
                 email: 'admin@reinfo.pe',
-                role: 'admin',
-                quota_limit: 1000000
+                role: 'user',
+                plan: 'BASIC',
+                quota_limit: 100
             });
             
             console.log('👤 Admin user created: admin / admin123');

@@ -43,6 +43,10 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isValidatingSession, setIsValidatingSession] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaToken, setMfaToken] = useState("");
+  const [twoFactorSetup, setTwoFactorSetup] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
 
   useEffect(() => {
     checkSession();
@@ -136,17 +140,45 @@ export default function Home() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    
     try {
-      const res = await axios.post("/api/v1/auth/login", { 
-        username: e.target.username.value, 
-        password: e.target.password.value 
-      });
+      const res = await axios.post("/api/v1/auth/login", { email, password });
+      
+      if (res.data.mfaRequired) {
+        setMfaToken(res.data.mfaToken);
+        setMfaRequired(true);
+        return;
+      }
+
       if (res.data.success) {
         setUser(res.data.user);
         setIsLoggedIn(true);
       }
     } catch (err) {
       setLoginError(err.response?.data?.message || "Acceso no autorizado.");
+    }
+  };
+
+  const handleVerifyMFA = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoading(true);
+    try {
+      const res = await axios.post("/api/v1/auth/login/verify", { 
+        code: e.target.code.value,
+        mfaToken
+      });
+      if (res.data.success) {
+        setUser(res.data.user);
+        setIsLoggedIn(true);
+        setMfaRequired(false);
+      }
+    } catch (err) {
+      setLoginError(err.response?.data?.message || "Código inválido.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -267,33 +299,43 @@ export default function Home() {
           </div>
           
           <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-zinc-200/20 dark:shadow-none p-10">
-            <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-6">
-              {isRegistering && (
-                <div className="space-y-2">
-                  <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Email</label>
-                  <input 
-                    name="email" type="email" required 
-                    className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
-                    placeholder="empresa@correo.com"
-                  />
+            <form onSubmit={mfaRequired ? handleVerifyMFA : (isRegistering ? handleRegister : handleLogin)} className="space-y-6">
+              {!mfaRequired ? (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Correo Electrónico</label>
+                    <input 
+                      name="email" type="email" required 
+                      className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-300"
+                      placeholder="empresa@correo.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Contraseña</label>
+                    <input 
+                      name="password" type="password" required 
+                      className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-300"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
+                   <div className="text-center space-y-2">
+                      <AlertCircle className="w-8 h-8 text-blue-500 mx-auto" />
+                      <p className="text-sm font-light">Verificación en dos pasos requerida</p>
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Código de 6 dígitos</label>
+                      <input 
+                        name="code" type="text" maxLength="6" required autoFocus
+                        className="w-full h-12 text-center text-xl tracking-[0.5em] font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:border-blue-500 transition-all"
+                        placeholder="000000"
+                      />
+                   </div>
                 </div>
               )}
-              <div className="space-y-2">
-                <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Usuario</label>
-                <input 
-                  name="username" type="text" required 
-                  className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-300"
-                  placeholder="admin_empresa"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Contraseña</label>
-                <input 
-                  name="password" type="password" required 
-                  className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-300"
-                  placeholder="••••••••"
-                />
-              </div>
+              
               {isRegistering && (
                 <div className="space-y-2">
                   <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Plan Inicial</label>
@@ -317,14 +359,25 @@ export default function Home() {
                   <p className="text-xs font-light text-center">{loginError}</p>
                 </div>
               )}
-              <button className="w-full h-12 bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 font-light rounded-xl hover:opacity-90 transition-all shadow-lg shadow-zinc-900/10 dark:shadow-none">
-                {isRegistering ? 'Registrar Empresa' : 'Continuar'}
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full h-12 bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 font-light rounded-xl hover:opacity-90 transition-all shadow-lg shadow-zinc-900/10 dark:shadow-none disabled:opacity-50"
+              >
+                {loading ? 'Procesando...' : mfaRequired ? 'Verificar Código' : isRegistering ? 'Registrar Empresa' : 'Continuar'}
               </button>
             </form>
+            
             <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-center">
-              <button onClick={() => setIsRegistering(!isRegistering)} className="text-xs font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-colors">
-                {isRegistering ? '¿Ya tienes cuenta? Ingresa' : '¿Nueva empresa? Regístrate'}
-              </button>
+              {mfaRequired ? (
+                <button onClick={() => setMfaRequired(false)} className="text-xs font-light text-zinc-400 hover:text-zinc-900 uppercase tracking-widest">
+                  Volver al inicio
+                </button>
+              ) : (
+                <button onClick={() => setIsRegistering(!isRegistering)} className="text-xs font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-colors">
+                  {isRegistering ? '¿Ya tienes cuenta? Ingresa' : '¿Nueva empresa? Regístrate'}
+                </button>
+              )}
             </div>
           </div>
           <div className="text-center">
@@ -679,6 +732,83 @@ export default function Home() {
                            </button>
                         </div>
                      </div>
+                  </section>
+
+                  {/* 2FA Section */}
+                  <section className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 space-y-6">
+                     <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-light flex items-center gap-2">
+                           <AlertCircle className="w-5 h-5 text-blue-500" />
+                           Seguridad: Autenticación en 2 Pasos
+                        </h3>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${usage?.user?.two_factor_enabled ? 'bg-emerald-100 text-emerald-600' : 'bg-zinc-100 text-zinc-400'}`}>
+                           {usage?.user?.two_factor_enabled ? 'Activado' : 'Desactivado'}
+                        </span>
+                     </div>
+
+                     {!twoFactorSetup ? (
+                        <div className="space-y-4">
+                           <p className="text-sm text-zinc-500 leading-relaxed">
+                              Añade una capa extra de seguridad a tu cuenta corporativa usando una aplicación de autenticación (Google Authenticator, Authy, etc).
+                           </p>
+                           <button 
+                             onClick={async () => {
+                               setLoading(true);
+                               try {
+                                 const res = await axios.post("/api/v1/auth/2fa/setup");
+                                 setTwoFactorSetup(res.data);
+                               } catch (err) { console.error(err); }
+                               finally { setLoading(false); }
+                             }}
+                             className="px-6 py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-light rounded-xl hover:opacity-90 transition-all uppercase tracking-widest"
+                           >
+                              Configurar 2FA
+                           </button>
+                        </div>
+                     ) : (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-4">
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                              <div className="space-y-4">
+                                 <p className="text-sm font-light">1. Escanea este código QR con tu aplicación:</p>
+                                 <div className="w-48 h-48 bg-white p-2 border rounded-2xl mx-auto md:mx-0">
+                                    <img src={twoFactorSetup.qrCode} alt="2FA QR Code" className="w-full h-full" />
+                                 </div>
+                                 <p className="text-[10px] text-zinc-400 font-mono break-all">{twoFactorSetup.secret}</p>
+                              </div>
+                              <div className="space-y-4">
+                                 <p className="text-sm font-light">2. Ingresa el código de 6 dígitos para verificar:</p>
+                                 <form 
+                                   onSubmit={async (e) => {
+                                     e.preventDefault();
+                                     setLoading(true);
+                                     try {
+                                       const res = await axios.post("/api/v1/auth/2fa/verify", { code: e.target.code.value });
+                                       if (res.data.success) {
+                                          alert("2FA Activado correctamente");
+                                          setTwoFactorSetup(null);
+                                          fetchUsage();
+                                       }
+                                     } catch (err) { alert(err.response?.data?.message || "Error al verificar"); }
+                                     finally { setLoading(false); }
+                                   }}
+                                   className="space-y-4"
+                                 >
+                                    <input 
+                                      name="code" type="text" maxLength="6" required 
+                                      className="w-full h-12 text-center text-xl tracking-[0.5em] font-mono bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:border-blue-500"
+                                      placeholder="000000"
+                                    />
+                                    <button className="w-full h-12 bg-blue-600 text-white text-xs font-light rounded-xl hover:bg-blue-700 transition-all uppercase tracking-widest">
+                                       Verificar y Activar
+                                    </button>
+                                    <button type="button" onClick={() => setTwoFactorSetup(null)} className="w-full text-[10px] text-zinc-400 uppercase tracking-widest hover:text-zinc-900 mt-2">
+                                       Cancelar
+                                    </button>
+                                 </form>
+                              </div>
+                           </div>
+                        </div>
+                     )}
                   </section>
                </div>
             </div>

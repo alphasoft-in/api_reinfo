@@ -72,8 +72,10 @@ export async function GET(request) {
         const filteredCount = await countRegistros(filter);
         const stats = await getStats();
 
-        // Perform Logging and Quota Update for any data retrieval
-        await updateQuota(user.id);
+        // Perform Logging and Quota Update for any data retrieval (except superadmins)
+        if (user.role !== 'superadmin') {
+            await updateQuota(user.id);
+        }
         if (ruc) await logConsulta(user.id, ruc);
 
         return NextResponse.json({
