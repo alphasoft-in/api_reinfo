@@ -187,7 +187,6 @@ export default function Home() {
     setLoginError("");
     try {
       const res = await axios.post("/api/v1/auth/register", { 
-        username: e.target.username.value, 
         password: e.target.password.value,
         email: e.target.email.value,
         plan: e.target.plan?.value || 'FREE'
@@ -303,7 +302,7 @@ export default function Home() {
               {!mfaRequired ? (
                 <>
                   <div className="space-y-2">
-                    <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">Correo Electrónico</label>
+                    <label className="text-xs font-light text-zinc-500 uppercase tracking-widest ml-1">{isRegistering ? 'Email Corporativo' : 'Correo Electrónico'}</label>
                     <input 
                       name="email" type="email" required 
                       className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all placeholder:text-zinc-300"

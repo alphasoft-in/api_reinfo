@@ -4,22 +4,18 @@ import { createUser, getUserByUsername } from '@/lib/db';
 
 export async function POST(request) {
     try {
-        let { username, password, email, plan } = await request.json();
+        let { password, email, plan } = await request.json();
 
         // 1. Input Validation & Sanitization
-        if (typeof username !== 'string' || typeof password !== 'string' || typeof email !== 'string') {
+        if (typeof password !== 'string' || typeof email !== 'string') {
             return NextResponse.json({ success: false, message: 'Formato de entrada inválido' }, { status: 400 });
         }
 
-        username = username.trim().toLowerCase();
         email = email.trim().toLowerCase();
+        const username = email; // Use email as username
 
-        if (!username || !password || !email) {
+        if (!password || !email) {
             return NextResponse.json({ success: false, message: 'Todos los campos son requeridos' }, { status: 400 });
-        }
-
-        if (username.length < 3 || username.length > 20) {
-            return NextResponse.json({ success: false, message: 'El usuario debe tener entre 3 y 20 caracteres' }, { status: 400 });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,7 +23,7 @@ export async function POST(request) {
             return NextResponse.json({ success: false, message: 'Formato de correo inválido' }, { status: 400 });
         }
 
-        // Validate if user exists
+        // Validate if user exists (using email as username)
         const existingUser = await getUserByUsername(username);
         if (existingUser) {
             return NextResponse.json(
