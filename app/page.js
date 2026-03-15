@@ -396,7 +396,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
               <Activity className="w-5 h-5 text-white dark:text-zinc-900" />
             </div>
-            <span className="font-light text-lg tracking-normal">REINFO Pro V3</span>
+            <span className="font-light text-lg tracking-normal">REINFO Pro</span>
           </div>
         </div>
         
