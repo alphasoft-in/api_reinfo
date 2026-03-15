@@ -57,12 +57,20 @@ export async function GET(request) {
 
     try {
         const { searchParams } = new URL(request.url);
-        const ruc = searchParams.get('ruc');
-        const name = searchParams.get('name');
-        const codigoUnico = searchParams.get('codigoUnico');
-        const status = searchParams.get('status');
         const limit = parseInt(searchParams.get('limit')) || 25;
         const offset = parseInt(searchParams.get('offset')) || 0;
+
+        // Restriction: Normal users MUST provide a search filter
+        if (user.role !== 'superadmin' && !ruc && !name && !codigoUnico) {
+            return NextResponse.json({ 
+                success: true, 
+                count: 0, 
+                totalCount: 0, 
+                filteredCount: 0, 
+                data: [],
+                message: 'Se requiere un término de búsqueda para obtener resultados.'
+            });
+        }
 
         const filter = { ruc, minero: name, codigoUnico };
         if (status === 'vigente') filter.estado = 'VIGENTE';
@@ -75,8 +83,12 @@ export async function GET(request) {
         // Perform Logging and Quota Update for any data retrieval (except superadmins)
         if (user.role !== 'superadmin') {
             await updateQuota(user.id);
+            // DO NOT log consulta for regular clients to prevent "saving history"
+            // if (ruc) await logConsulta(user.id, ruc); 
+        } else {
+            // Only log for superadmins if needed, or remove completely if requested
+            if (ruc) await logConsulta(user.id, ruc);
         }
-        if (ruc) await logConsulta(user.id, ruc);
 
         return NextResponse.json({
             success: true,

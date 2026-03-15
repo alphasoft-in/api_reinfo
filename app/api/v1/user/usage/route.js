@@ -38,9 +38,9 @@ export async function GET(request) {
                 subscription_end: user.subscription_end,
                 two_factor_enabled: user.two_factor_enabled
             },
-            analytics: {
+            analytics: user.role === 'superadmin' ? {
                 topRucs
-            }
+            } : null
         });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });

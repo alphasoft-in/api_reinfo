@@ -405,8 +405,10 @@ export default function Home() {
             <p className="px-3 text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-2">Monitor Principal</p>
             {[
               { id: "dashboard", icon: LayoutDashboard, label: "Vista General" },
-              { id: "vigentes", icon: CheckCircle2, label: "Registros Vigentes" },
-              { id: "suspendidos", icon: PauseCircle, label: "En Suspensión" },
+              ...(user?.role === 'superadmin' ? [
+                { id: "vigentes", icon: CheckCircle2, label: "Registros Vigentes" },
+                { id: "suspendidos", icon: PauseCircle, label: "En Suspensión" },
+              ] : []),
               { id: "planes", icon: Zap, label: "Planes y Precios" },
             ].map(item => (
               <button
@@ -1039,14 +1041,16 @@ export default function Home() {
                           <p className="text-sm text-zinc-400 font-light leading-relaxed">
                             Ingresa un RUC o Nombre en la barra superior para buscar un minero específico.
                           </p>
-                          <div className="pt-4">
-                            <button 
-                              onClick={handleBrowseAll}
-                              className="text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-all underline underline-offset-4"
-                            >
-                              O explorar todos los registros (1 crédito)
-                            </button>
-                          </div>
+                          {user?.role === 'superadmin' && (
+                            <div className="pt-4">
+                              <button 
+                                onClick={handleBrowseAll}
+                                className="text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest transition-all underline underline-offset-4"
+                                >
+                                O explorar todos los registros (1 crédito)
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
