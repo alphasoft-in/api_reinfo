@@ -83,10 +83,9 @@ export async function GET(request) {
         // Perform Logging and Quota Update for any data retrieval (except superadmins)
         if (user.role !== 'superadmin') {
             await updateQuota(user.id);
-            // DO NOT log consulta for regular clients to prevent "saving history"
-            // if (ruc) await logConsulta(user.id, ruc); 
+            // Definitively disabled query logging for clients to protect business model (recurrence)
         } else {
-            // Only log for superadmins if needed, or remove completely if requested
+            // Only log for superadmins if needed for auditing
             if (ruc) await logConsulta(user.id, ruc);
         }
 

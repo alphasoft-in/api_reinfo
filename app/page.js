@@ -957,48 +957,73 @@ export default function Home() {
             <>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-light tracking-normal">Panel de Control</h1>
-              <p className="text-sm text-zinc-400 font-light mt-1">Gestión integral de la base de datos nacional REINFO.</p>
+              <h1 className="text-2xl font-light tracking-normal">
+                {user?.role === 'superadmin' ? 'Panel de Control de Sistema' : 'Mi Consumo REINFO'}
+              </h1>
+              <p className="text-sm text-zinc-400 font-light mt-1">
+                {user?.role === 'superadmin' 
+                  ? 'Gestión integral de la base de datos nacional REINFO.' 
+                  : 'Monitoreo de créditos y consultas corporativas.'}
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={() => {
-                  if (user?.role === 'superadmin' || query || hasSearched) {
-                    fetchData();
-                  }
+                  fetchUsage();
+                  if (user?.role === 'superadmin') fetchStats();
+                  if (query || hasSearched) fetchData();
                 }} 
                 className="inline-flex items-center h-10 px-5 text-sm font-light bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm"
               >
                 <RefreshCw className={`w-3.5 h-3.5 mr-2 ${loading && 'animate-spin'}`} />
                 Actualizar
               </button>
-              <button className="inline-flex items-center h-10 px-5 text-sm font-light bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl hover:opacity-90 transition-all shadow-md shadow-zinc-900/10 dark:shadow-none">
-                <ExternalLink className="w-3.5 h-3.5 mr-2" />
-                Exportar
-              </button>
             </div>
           </div>
 
-          {/* Quick Metrics */}
+          {/* Quick Metrics - Independent Views */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { label: "Total Registros", value: stats.total, color: "text-zinc-900 dark:text-white", icon: Users },
-              { label: "Vigentes Activos", value: stats.vigentes, color: "text-emerald-600 dark:text-emerald-400", icon: CheckCircle2 },
-              { label: "En Suspensión", value: stats.suspendidos, color: "text-red-600 dark:text-red-400", icon: AlertCircle },
-            ].map((stat, i) => (
-              <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
-                <div>
-                   <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
-                   <div className="flex items-baseline gap-1.5">
-                      <p className={`text-2xl font-light tracking-normal ${stat.color}`}>{(stat.value || 0).toLocaleString()}</p>
-                      <span className="text-[9px] font-light text-zinc-300 uppercase tracking-normaler">Nodos</span>
+            {user?.role === 'superadmin' ? (
+              // Case 1: Superadmin (Global Monitor)
+              [
+                { label: "Total Registros", value: stats.total, color: "text-zinc-900 dark:text-white", icon: Users },
+                { label: "Vigentes Activos", value: stats.vigentes, color: "text-emerald-600 dark:text-emerald-400", icon: CheckCircle2 },
+                { label: "En Suspensión", value: stats.suspendidos, color: "text-red-600 dark:text-red-400", icon: AlertCircle },
+              ].map((stat, i) => (
+                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
+                  <div>
+                     <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
+                     <div className="flex items-baseline gap-1.5">
+                        <p className={`text-2xl font-light tracking-normal ${stat.color}`}>{(stat.value || 0).toLocaleString()}</p>
+                        <span className="text-[9px] font-light text-zinc-300 uppercase tracking-normaler">Nodos</span>
+                     </div>
                    </div>
-                 </div>
-                <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-5 h-5 opacity-80" />
+                  <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
+                    <stat.icon className="w-5 h-5 opacity-80" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              // Case 2: Client (Personal Consumption Only)
+              [
+                { label: "Consultas Realizadas", value: usage.quota_used, color: "text-zinc-900 dark:text-white", icon: RefreshCw, unit: "Búsquedas" },
+                { label: "Créditos Disponibles", value: Math.max(0, usage.quota_limit - usage.quota_used), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
+                { label: "Créditos del Plan", value: usage.quota_limit, color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage.plan },
+              ].map((stat, i) => (
+                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
+                  <div>
+                     <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
+                     <div className="flex items-baseline gap-1.5">
+                        <p className={`text-2xl font-light tracking-normal ${stat.color}`}>{(stat.value || 0).toLocaleString()}</p>
+                        <span className="text-[9px] font-light text-zinc-300 uppercase tracking-normaler">{stat.unit}</span>
+                     </div>
+                   </div>
+                  <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
+                    <stat.icon className="w-5 h-5 opacity-80" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Master Table - Hidden for regular users until they search */}
