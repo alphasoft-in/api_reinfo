@@ -409,8 +409,9 @@ export default function Home() {
               ...(user?.role === 'superadmin' ? [
                 { id: "vigentes", icon: CheckCircle2, label: "Registros Vigentes" },
                 { id: "suspendidos", icon: PauseCircle, label: "En Suspensión" },
-              ] : []),
-              { id: "planes", icon: Zap, label: "Planes y Precios" },
+              ] : [
+                { id: "planes", icon: Zap, label: "Planes y Precios" },
+              ]),
             ].map(item => (
               <button
                 key={item.id}
@@ -924,12 +925,13 @@ export default function Home() {
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {[
-                    { name: 'Free', price: '0', limit: '10', features: ['Consultas básicas', 'Acceso portal', 'Soporte email'] },
-                    { name: 'Professional', price: '49', limit: '10,000', features: ['Consultas ilimitadas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
-                    { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Todo lo Pro', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
+                    { name: 'Free', price: '0', limit: '10', features: ['10 Consultas Únicas', 'Acceso portal', 'Soporte email'] },
+                    { name: 'Professional', price: '49', limit: '10,000', features: ['10k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
+                    { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Consultas Ilimitadas*', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
                   ].map((plan, i) => (
-                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-sm' : 'border-zinc-100 dark:border-zinc-800'} rounded-[32px] p-10 flex flex-col relative`}>
-                       {plan.name === 'Professional' && <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-light px-2.5 py-1 rounded-full uppercase tracking-[0.3em]">Popular</div>}
+                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-sm' : 'border-zinc-100 dark:border-zinc-800'} rounded-[32px] p-10 flex flex-col relative ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
+                       {usage?.user?.plan === plan.name.toUpperCase() && <div className="absolute -top-3 left-10 bg-emerald-500 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Plan Activo</div>}
+                       {plan.name === 'Professional' && plan.name.toUpperCase() !== usage?.user?.plan && <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-light px-2.5 py-1 rounded-full uppercase tracking-[0.3em]">Popular</div>}
                        <h4 className="text-[10px] font-light text-zinc-400 uppercase tracking-[0.3em] mb-3">{plan.name}</h4>
                        <div className="flex items-baseline gap-1 mb-6">
                           <span className="text-2xl font-extralight font-mono text-zinc-900 dark:text-zinc-100">${plan.price}</span>
