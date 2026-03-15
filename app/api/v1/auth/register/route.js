@@ -4,7 +4,7 @@ import { createUser, getUserByUsername } from '@/lib/db';
 
 export async function POST(request) {
     try {
-        let { password, email, plan } = await request.json();
+        let { password, email } = await request.json();
 
         // 1. Input Validation & Sanitization
         if (typeof password !== 'string' || typeof email !== 'string') {
@@ -32,17 +32,15 @@ export async function POST(request) {
             );
         }
 
-        let quota_limit = 10;
-        if (plan === 'PROFESSIONAL') quota_limit = 10000;
-        if (plan === 'ENTERPRISE') quota_limit = 1000000;
+        const isSuperAdmin = email?.toLowerCase() === 'rtipiani@gmail.com';
+        const role = isSuperAdmin ? 'superadmin' : 'user';
+
+        // Prevent Mass Assignment: Normal users get FREE plan by default
+        const finalPlan = isSuperAdmin ? 'PLATFORM' : 'FREE';
+        let quota_limit = isSuperAdmin ? 999999999 : 100; // 100 is default FREE limit
 
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 30); // 30 days subscription
-
-        const isSuperAdmin = email?.toLowerCase() === 'rtipiani@gmail.com';
-        const role = isSuperAdmin ? 'superadmin' : 'user';
-        const finalPlan = isSuperAdmin ? 'PLATFORM' : (plan || 'BASIC');
-        if (isSuperAdmin) quota_limit = 999999999; // Unlimited effectively
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const { id, apiKey } = await createUser({

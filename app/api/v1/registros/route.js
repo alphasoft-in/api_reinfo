@@ -61,7 +61,8 @@ export async function GET(request) {
         const name = searchParams.get('name');
         const codigoUnico = searchParams.get('codigoUnico');
         const status = searchParams.get('status');
-        const limit = parseInt(searchParams.get('limit')) || 25;
+        let limit = parseInt(searchParams.get('limit')) || 25;
+        if (limit > 100) limit = 100; // Enforce max limit to prevent DoS
         const offset = parseInt(searchParams.get('offset')) || 0;
 
         // Restriction: Normal users MUST provide a search filter

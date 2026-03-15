@@ -34,8 +34,9 @@ export async function POST(request) {
             plan: plan.toUpperCase(),
             quota_limit: quotaLimit,
             subscription_end: user.subscription_end, // Keep current or extend
-            active: true,
-            role: user.role
+            active: user.active,
+            role: user.role,
+            payment_status: user.payment_status || 'pending'
         });
 
         return NextResponse.json({ 
