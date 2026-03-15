@@ -74,6 +74,7 @@ export async function POST(request) {
             const mfaToken = signToken({
                 id: user.id,
                 username: user.username,
+                email: user.email,
                 role: user.role,
                 mfa_pending: true
             });
@@ -88,6 +89,7 @@ export async function POST(request) {
         const token = signToken({
             id: user.id,
             username: user.username,
+            email: user.email,
             role: user.role
         });
 
