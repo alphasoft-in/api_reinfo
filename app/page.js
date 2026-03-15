@@ -73,13 +73,14 @@ export default function Home() {
     if (isLoggedIn) {
       fetchStats();
       fetchUsage();
-      if (user?.role === 'superadmin') fetchAdminUsers();
-      
-      // Only fetch data if we have a query or have already searched/requested browsing
-      if (query || hasSearched) {
+      if (user?.role === 'superadmin') {
+        fetchAdminUsers();
+        fetchData(); // Admins load data automatically
+      } else if (query || hasSearched) {
+        // Regular users only load if searching/requested
         fetchData();
       } else {
-        setData([]); // Ensure clean state if not searching
+        setData([]); 
       }
     }
   }, [isLoggedIn, page, activeTab, hasSearched]);
@@ -810,7 +811,14 @@ export default function Home() {
               <p className="text-sm text-zinc-400 font-light mt-1">Gestión integral de la base de datos nacional REINFO.</p>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => fetchData()} className="inline-flex items-center h-10 px-5 text-sm font-light bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
+              <button 
+                onClick={() => {
+                  if (user?.role === 'superadmin' || query || hasSearched) {
+                    fetchData();
+                  }
+                }} 
+                className="inline-flex items-center h-10 px-5 text-sm font-light bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm"
+              >
                 <RefreshCw className={`w-3.5 h-3.5 mr-2 ${loading && 'animate-spin'}`} />
                 Actualizar
               </button>
