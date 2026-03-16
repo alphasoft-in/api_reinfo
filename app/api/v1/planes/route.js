@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getPlanes, updatePlan } from '@/lib/db';
+import { getPlanes, updatePlan, initDb } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export async function GET() {
     try {
+        await initDb();
         const planes = await getPlanes();
         return NextResponse.json({ success: true, planes });
     } catch (error) {
