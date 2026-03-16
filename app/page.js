@@ -999,13 +999,18 @@ export default function Home() {
                            className={`flex items-baseline gap-1 mb-8 ${user?.role === 'superadmin' ? 'cursor-pointer hover:opacity-70 transition-opacity' : ''}`}
                            onClick={() => user?.role === 'superadmin' && setEditingPlan(plan.id)}
                          >
-                            <span className="text-4xl font-extralight tracking-tight text-zinc-900 dark:text-zinc-100">${plan.price}</span>
+                            <span className="text-4xl font-extralight tracking-tight text-zinc-900 dark:text-zinc-100">${Number(plan.price).toLocaleString()}</span>
                             <span className="text-[11px] text-zinc-400 font-light">/mes</span>
                             {user?.role === 'superadmin' && <Edit3 className="w-3 h-3 ml-2 text-zinc-300" />}
                          </div>
                        )}
 
                        <div className="h-[1px] bg-zinc-100 dark:bg-zinc-800 w-full mb-8" />
+                       
+                       <div className="mb-4">
+                         <p className="text-[10px] text-zinc-400 font-light uppercase tracking-widest mb-1">Capacidad Mensual</p>
+                         <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{Number(plan.limit || 0).toLocaleString()} Consultas</p>
+                       </div>
 
                        <ul className="space-y-4 mb-10 flex-1">
                           {plan.features.map((f, j) => (

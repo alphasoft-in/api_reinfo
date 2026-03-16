@@ -7,7 +7,13 @@ export async function GET() {
     try {
         await initDb();
         const planes = await getPlanes();
-        return NextResponse.json({ success: true, planes });
+        // Ensure numeric fields are numbers
+        const mappedPlanes = planes.map(p => ({
+            ...p,
+            price: Number(p.price.replace(/,/g, '')),
+            limit: Number(p.limit.replace(/,/g, ''))
+        }));
+        return NextResponse.json({ success: true, planes: mappedPlanes });
     } catch (error) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
@@ -15,8 +21,7 @@ export async function GET() {
 
 export async function PUT(req) {
     try {
-        const cookieStore = cookies();
-        const token = cookieStore.get('auth_token')?.value;
+        const token = cookies().get('auth_token')?.value;
         const decoded = await verifyToken(token);
 
         if (!decoded || decoded.role !== 'superadmin') {
