@@ -762,60 +762,25 @@ export default function Home() {
                            </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                           <div className="flex items-center justify-end gap-3">
-                              <div className="flex flex-col gap-1 items-end">
-                                <label className="text-[9px] font-light text-zinc-400">PLAN</label>
-                                <div className="relative group/sel">
-                                  <select 
-                                    value={u.plan}
-                                    onChange={(e) => handleUpdateUser(u.id, { 
-                                      plan: e.target.value, 
-                                      quota_limit: e.target.value === 'ENTERPRISE' ? 1000000 : e.target.value === 'PROFESSIONAL' ? 10000 : 5, 
-                                      active: u.active, 
-                                      role: u.role,
-                                      payment_status: u.payment_status 
-                                    })}
-                                    className="appearance-none text-[11px] font-light bg-zinc-50 dark:bg-zinc-800 border-none rounded-lg h-8 pl-2 pr-8 focus:ring-0 w-full cursor-pointer"
-                                  >
-                                    <option value="FREE">FREE</option>
-                                    <option value="PROFESSIONAL">PRO</option>
-                                    <option value="ENTERPRISE">ENT</option>
-                                  </select>
-                                  <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none group-hover/sel:text-zinc-600 transition-colors" />
-                                </div>
-                              </div>
-
-                              <button 
-                                onClick={() => handleUpdateUser(u.id, { 
-                                  ...u, 
-                                  active: !u.active,
-                                  subscription_end: u.subscription_end,
-                                  quota_limit: u.quota_limit,
-                                  payment_status: u.payment_status
-                                })}
-                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.active ? 'hover:bg-red-50 hover:text-red-600 border-transparent' : 'bg-blue-50 text-blue-600 border-blue-100'}`}
-                              >
-                                {u.active ? 'SUSPENDER' : 'ACTIVAR'}
-                              </button>
-
+                           <div className="flex items-center justify-end gap-4">
                               <button 
                                 onClick={() => handleUpdateUser(u.id, { 
                                   ...u, 
                                   payment_status: u.payment_status === 'active' ? 'pending' : 'active',
                                   subscription_end: u.subscription_end,
                                   quota_limit: u.quota_limit,
-                                  requested_plan: u.requested_plan // Logic in server will handle the swap
+                                  requested_plan: u.requested_plan
                                 })}
-                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.payment_status === 'active' ? 'bg-zinc-50 text-zinc-400 border-transparent italic' : u.payment_status === 'pending_approval' ? 'bg-blue-600 text-white border-transparent' : 'bg-zinc-800 text-zinc-100 shadow-lg shadow-zinc-900/10'}`}
+                                className={`h-9 px-4 rounded-xl text-[10px] font-medium transition-all ${u.payment_status === 'active' ? 'bg-zinc-100/50 text-zinc-400 hover:text-red-500' : u.payment_status === 'pending_approval' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20' : 'bg-zinc-900 text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900'}`}
                               >
                                 {u.payment_status === 'active' ? 'ANULAR PAGO' : u.payment_status === 'pending_approval' ? 'APROBAR Y ACTIVAR' : 'APROBAR PAGO'}
                               </button>
 
-                              <div className="flex items-center gap-1 border-l border-zinc-100 dark:border-zinc-800 pl-3 ml-1">
+                              <div className="flex items-center gap-1 border-l border-zinc-100 dark:border-zinc-800 pl-4">
                                 <button 
                                   onClick={() => setEditingUser(u)}
                                   className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                                  title="Editar Detalles"
+                                  title="Gestionar Acceso"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
@@ -880,49 +845,80 @@ export default function Home() {
                        </button>
                      </div>
                      
-                     <form onSubmit={(e) => {
-                       e.preventDefault();
-                       handleUpdateUser(editingUser.id, {
-                         email: e.target.email.value,
-                         quota_limit: parseInt(e.target.quota.value),
-                         plan: e.target.plan.value,
-                         active: editingUser.active,
-                         role: editingUser.role,
-                         payment_status: editingUser.payment_status
-                       });
-                       setEditingUser(null);
-                     }} className="space-y-6">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Identidad Corporativa (Email)</label>
-                          <input 
-                            name="email" type="email" defaultValue={editingUser.email || editingUser.username} required 
-                            className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
-                          />
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Plan de Acceso</label>
-                            <div className="relative">
-                              <select 
-                                name="plan" defaultValue={editingUser.plan}
-                                className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
-                              >
-                                <option value="FREE">FREE</option>
-                                <option value="PROFESSIONAL">PROFESSIONAL</option>
-                                <option value="ENTERPRISE">ENTERPRISE</option>
-                              </select>
-                              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                       <form onSubmit={(e) => {
+                         e.preventDefault();
+                         handleUpdateUser(editingUser.id, {
+                           email: e.target.email.value,
+                           quota_limit: parseInt(e.target.quota.value),
+                           plan: e.target.plan.value,
+                           active: e.target.status.value === 'true',
+                           role: e.target.role.value,
+                           payment_status: editingUser.payment_status
+                         });
+                         setEditingUser(null);
+                       }} className="space-y-6">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Estado de Acceso</label>
+                              <div className="relative">
+                                <select 
+                                  name="status" defaultValue={editingUser.active.toString()}
+                                  className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
+                                >
+                                  <option value="true">ACTIVO / OPERATIVO</option>
+                                  <option value="false">SUSPENDIDO / BLOQUEADO</option>
+                                </select>
+                                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Rol de Usuario</label>
+                              <div className="relative">
+                                <select 
+                                  name="role" defaultValue={editingUser.role}
+                                  className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
+                                >
+                                  <option value="user">USUARIO ESTÁNDAR</option>
+                                  <option value="admin">ADMINISTRADOR</option>
+                                  <option value="superadmin">SUPERADMIN</option>
+                                </select>
+                                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              </div>
                             </div>
                           </div>
+
                           <div className="space-y-2">
-                            <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Cupo de Consultas</label>
+                            <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Identidad Corporativa (Email)</label>
                             <input 
-                              name="quota" type="number" defaultValue={editingUser.quota_limit} required 
+                              name="email" type="email" defaultValue={editingUser.email || editingUser.username} required 
                               className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
                             />
                           </div>
-                        </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Plan de Acceso</label>
+                              <div className="relative">
+                                <select 
+                                  name="plan" defaultValue={editingUser.plan}
+                                  className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
+                                >
+                                  <option value="FREE">FREE</option>
+                                  <option value="PROFESSIONAL">PROFESSIONAL</option>
+                                  <option value="ENTERPRISE">ENTERPRISE</option>
+                                  <option value="PLATFORM">PLATFORM</option>
+                                </select>
+                                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Cupo de Consultas</label>
+                              <input 
+                                name="quota" type="number" defaultValue={editingUser.quota_limit} required 
+                                className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
+                              />
+                            </div>
+                          </div>
                         
                         <div className="pt-4 flex gap-3">
                           <button 
