@@ -1160,7 +1160,6 @@ export default function Home() {
               ))
             )}
           </div>
-          </div>
 
           {/* Master Table - Hidden for regular users until they search */}
           {(user?.role === 'superadmin' || hasSearched) && (
