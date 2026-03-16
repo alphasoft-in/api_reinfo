@@ -44,6 +44,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loginError, setLoginError] = useState("");
+  const [searchError, setSearchError] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isValidatingSession, setIsValidatingSession] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
@@ -145,6 +146,7 @@ export default function Home() {
 
   const fetchData = async (searchQuery = query) => {
     setLoading(true);
+    setSearchError("");
     try {
       const statusParam = activeTab === "vigentes" ? "vigente" : activeTab === "suspendidos" ? "suspendido" : "todos";
       const params = { limit: 12, offset: (page - 1) * 12, status: statusParam };
@@ -156,9 +158,16 @@ export default function Home() {
       if (res.data.success) {
         setData(res.data.data);
         setTotalPages(Math.ceil(res.data.filteredCount / 12));
+        // Proactive sync of usage after successful query
+        if (user?.role !== 'superadmin') fetchUsage();
       }
     } catch (err) {
       if (err.response?.status === 401) handleLogout();
+      if (err.response?.status === 403) {
+        setSearchError(err.response?.data?.message || "Límite de consultas alcanzado.");
+        setData([]); // Clear data if blocked
+      }
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -1059,6 +1068,24 @@ export default function Home() {
                   className="ml-auto px-4 py-2 bg-orange-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-orange-700 transition-all"
                 >
                   Ver Planes
+                </button>
+              </div>
+            )}
+
+            {searchError && (
+              <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl p-6 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+                  <ShieldAlert className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-red-900 dark:text-red-400 uppercase tracking-tight">Acceso Bloqueado</h3>
+                  <p className="text-[12px] text-red-700 dark:text-red-500 font-light mt-0.5">{searchError}</p>
+                </div>
+                <button 
+                  onClick={() => setActiveTab('planes')}
+                  className="px-5 py-2.5 bg-red-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                >
+                  Mejorar Plan
                 </button>
               </div>
             )}
