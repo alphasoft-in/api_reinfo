@@ -1211,10 +1211,10 @@ export default function Home() {
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {(plansConfig.length > 0 ? plansConfig : [
                     { name: 'Free', price: '0', limit: '5', features: ['5 Consultas Únicas', 'Acceso portal', 'Soporte email'] },
-                    { name: 'Professional', price: '49', limit: '10,000', features: ['10k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
-                    { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Consultas Ilimitadas*', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
+                    { name: 'Professional', price: '49', limit: '5,000', features: ['5k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
+                    { name: 'Enterprise', price: '199', limit: '20,000', features: ['20k Consultas RUC', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
                   ]).map((plan, i) => (
-                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none' : 'border-zinc-100 dark:border-zinc-800 shadow-sm'} rounded-[32px] p-10 flex flex-col relative transition-all duration-500 hover:scale-[1.02] ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-blue-600 dark:ring-blue-400 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
+                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200/60 dark:border-zinc-800 shadow-2xl shadow-zinc-200/40 dark:shadow-none' : 'border-zinc-100/80 dark:border-zinc-800/50 shadow-sm'} rounded-[40px] p-10 flex flex-col relative transition-all duration-500 hover:translate-y-[-4px] hover:shadow-xl ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-1 ring-blue-500/30 ring-offset-2 dark:ring-offset-zinc-950' : ''}`}>
                        {usage?.user?.plan === plan.name.toUpperCase() && (
                          <div className="absolute -top-3 left-10 bg-blue-600 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20 animate-in fade-in zoom-in">
                            Suscripción Activa
