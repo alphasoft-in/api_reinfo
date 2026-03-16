@@ -1296,16 +1296,16 @@ export default function Home() {
                         <button 
                           onClick={() => handlePlanSelect(plan.name)}
                           disabled={loading || usage?.user?.plan === plan.name.toUpperCase() || user?.role === 'superadmin' || usage?.user?.requested_plan === plan.name.toUpperCase()}
-                          className={`w-full py-4 rounded-2xl text-[10px] font-light transition-all uppercase tracking-[0.2em] shadow-md ${
+                          className={`w-full py-4 rounded-2xl text-[10px] font-medium transition-all uppercase tracking-[0.2em] shadow-lg ${
                             usage?.user?.plan === plan.name.toUpperCase() 
                               ? 'bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100' 
                               : usage?.user?.requested_plan === plan.name.toUpperCase()
-                                ? 'bg-amber-50 text-amber-600 border border-amber-100 animate-pulse'
+                                ? 'bg-amber-50 text-amber-600 border border-amber-200 animate-pulse'
                                 : user?.role === 'superadmin'
                                   ? 'bg-zinc-100 text-zinc-400 cursor-default'
                                   : plan.name === 'Professional' 
-                                    ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
-                                    : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-600/20 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:scale-[0.98]' 
+                                    : 'bg-white text-zinc-900 border border-zinc-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-blue-500/10 hover:-translate-y-0.5 active:scale-[0.98]'
                           }`}
                         >
                            {user?.role === 'superadmin' ? 'Modo Administración' : usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : usage?.user?.requested_plan === plan.name.toUpperCase() ? 'Aprobación Pendiente' : loading ? 'Procesando...' : 'Obtener Acceso'}
