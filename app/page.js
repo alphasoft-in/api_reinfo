@@ -65,6 +65,8 @@ export default function Home() {
   const [subHistory, setSubHistory] = useState([]);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [pendingUpgradePlan, setPendingUpgradePlan] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     checkSession();
@@ -172,6 +174,20 @@ export default function Home() {
     try {
       const res = await axios.get("/api/v1/user/subscriptions");
       if (res.data.success) setSubHistory(res.data.history);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get("/api/v1/user/notifications");
+      if (res.data.success) setNotifications(res.data.notifications);
+    } catch (err) { console.error(err); }
+  };
+
+  const markNotificationsAsRead = async () => {
+    try {
+      await axios.post("/api/v1/user/notifications");
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     } catch (err) { console.error(err); }
   };
 
@@ -628,6 +644,78 @@ export default function Home() {
 
           <div className="flex items-center gap-3 ml-6">
             <div className="h-8 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1" />
+            
+            <div className="relative">
+              <button 
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  setShowUserMenu(false);
+                  if (!showNotifications) markNotificationsAsRead();
+                }}
+                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all relative ${showNotifications ? 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm' : 'hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
+              >
+                <Bell className="w-4.5 h-4.5" />
+                {notifications.some(n => !n.is_read) && (
+                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-zinc-950 animate-pulse" />
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-[60] animate-in fade-in slide-in-from-top-2 origin-top-right overflow-hidden">
+                   <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-900/10">
+                      <p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Notificaciones</p>
+                      <span className="text-[9px] text-zinc-400 font-light px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full">
+                        {notifications.length} Totales
+                      </span>
+                   </div>
+                   
+                   <div className="max-h-[400px] overflow-y-auto overflow-x-hidden">
+                      {notifications.length === 0 ? (
+                        <div className="py-12 flex flex-col items-center justify-center text-center px-6">
+                           <div className="w-12 h-12 bg-zinc-50 dark:bg-zinc-900 rounded-full flex items-center justify-center mb-3">
+                              <Bell className="w-5 h-5 text-zinc-300" />
+                           </div>
+                           <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">Bandeja Vacía</p>
+                           <p className="text-[10px] text-zinc-500 mt-1">No tienes alertas pendientes en este momento.</p>
+                        </div>
+                      ) : notifications.map(notif => (
+                        <div key={notif.id} className={`p-5 border-b border-zinc-50 dark:border-zinc-900/50 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-all relative group ${!notif.is_read ? 'bg-blue-50/30 dark:bg-blue-900/5' : ''}`}>
+                           <div className="flex gap-4">
+                              <div className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center ${
+                                notif.type === 'success' ? 'bg-green-50 text-green-600' : 
+                                notif.type === 'warning' ? 'bg-amber-50 text-amber-600' :
+                                notif.type === 'error' ? 'bg-red-50 text-red-600' :
+                                'bg-blue-50 text-blue-600'
+                              }`}>
+                                 {notif.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : 
+                                  notif.type === 'warning' ? <AlertCircle className="w-4 h-4" /> :
+                                  notif.type === 'error' ? <ShieldAlert className="w-4 h-4" /> :
+                                  <Bell className="w-4 h-4" />}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                 <p className="text-[12px] font-medium text-zinc-900 dark:text-zinc-100 leading-tight mb-1">{notif.title}</p>
+                                 <p className="text-[11px] text-zinc-500 line-clamp-2 leading-relaxed font-light">{notif.message}</p>
+                                 <p className="text-[9px] text-zinc-400 mt-2 font-light uppercase tracking-tighter">
+                                    {new Date(notif.created_at).toLocaleDateString()} • {new Date(notif.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                 </p>
+                              </div>
+                              {!notif.is_read && (
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1 shrink-0 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                              )}
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+
+                   <button 
+                     onClick={() => setShowNotifications(false)}
+                     className="w-full py-3.5 text-[10px] font-light text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-widest bg-zinc-50/50 dark:bg-zinc-900/20 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all border-t border-zinc-100 dark:border-zinc-800"
+                   >
+                      Cerrar Panel
+                   </button>
+                </div>
+              )}
+            </div>
             
             <div className="relative user-menu-container">
               <button 
@@ -1452,6 +1540,7 @@ export default function Home() {
                   } else {
                     fetchUsage();
                     fetchSubHistory();
+                    fetchNotifications();
                   }
                   if (query || hasSearched) fetchData();
                 }} 

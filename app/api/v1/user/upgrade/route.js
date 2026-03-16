@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { adminUpdateUser, getUserByUsername } from '@/lib/db';
+import { adminUpdateUser, getUserByUsername, addNotification, getSuperadmins } from '@/lib/db';
 
 export async function POST(request) {
     try {
@@ -29,6 +29,17 @@ export async function POST(request) {
             payment_type: type,
             payment_reference: reference
         });
+
+        // Notify Superadmins
+        const admins = await getSuperadmins();
+        for (const admin of admins) {
+            await addNotification(
+                admin.id,
+                'Nuevo Reporte de Pago',
+                `El usuario ${user.username} ha reportado un pago de $${amount} para el plan ${plan}. Ref: ${reference}`,
+                'warning'
+            );
+        }
  
         return NextResponse.json({ 
             success: true, 

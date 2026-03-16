@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser, getPlanes, addSubscriptionRecord } from '@/lib/db';
+import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser, getPlanes, addSubscriptionRecord, addNotification } from '@/lib/db';
 
 const validateAdmin = async (request) => {
     const authHeader = request.headers.get('authorization');
@@ -107,6 +107,22 @@ export async function POST(request) {
                 start_date: startDate.toISOString(),
                 end_date: endDate.toISOString()
             });
+
+            // NOTIFY USER: Activation Success
+            await addNotification(
+                userId,
+                '¡Plan Activado Correctamente!',
+                `Tu suscripción al plan ${planToActivate} ha sido confirmada. Ya puedes disfrutar de tus nuevos beneficios.`,
+                'success'
+            );
+        } else if (updates.payment_status === 'pending' && updates.requested_plan) {
+            // NOTIFY USER: Rejection
+            await addNotification(
+                userId,
+                'Solicitud de Upgrade Rechazada',
+                `Tu reporte de pago para el plan ${updates.requested_plan} no pudo ser verificado. Por favor, contacta a soporte o intenta reportar de nuevo.`,
+                'error'
+            );
         }
 
         await adminUpdateUser(userId, updates);
