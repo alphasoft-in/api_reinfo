@@ -21,8 +21,17 @@ export async function GET() {
 
 export async function PUT(req) {
     try {
+        const authHeader = req.headers.get('authorization');
         const cookieStore = await cookies();
-        const token = cookieStore.get('auth_token')?.value;
+        const sessionCookie = cookieStore.get('reinfo_session')?.value;
+
+        let token = null;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.split(' ')[1];
+        } else if (sessionCookie) {
+            token = sessionCookie;
+        }
+
         const decoded = await verifyToken(token);
 
         if (!decoded || decoded.role !== 'superadmin') {
