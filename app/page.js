@@ -1122,81 +1122,95 @@ export default function Home() {
           ) : activeTab === 'docs' ? (
             <div className="max-w-4xl mx-auto space-y-10 pb-20">
                <div className="space-y-4">
-                  <h2 className="text-3xl font-light tracking-normal">Documentación Técnica API</h2>
-                  <p className="text-zinc-500 font-light">Guía integral para desarrolladores e integradores del ecosistema REINFO Pro.</p>
+                  <h2 className="text-3xl font-light tracking-normal">Documentación Técnica API <span className="text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full ml-2">v1.2</span></h2>
+                  <p className="text-zinc-500 font-light">Guía técnica para la integración corporativa con el ecosistema REINFO Pro.</p>
                </div>
 
-               <div className="grid grid-cols-1 gap-8">
-                  {/* Auth Section */}
-                  <section className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 space-y-6">
-                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
-                           <Zap className="w-5 h-5 text-white dark:text-zinc-900" />
-                        </div>
-                        <h3 className="text-xl font-light">Autenticación</h3>
+               {/* Auth Section */}
+               <section className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-8 shadow-sm space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                     <div className="w-10 h-10 rounded-2xl bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
+                        <Zap className="w-5 h-5 text-white dark:text-zinc-900" />
                      </div>
-                     <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                        Nuestra API utiliza llaves secretas para autenticar las peticiones. Puedes encontrar tu API Key en tu perfil. Todas las peticiones deben incluirla en los headers.
-                     </p>
-                     <div className="bg-zinc-50 dark:bg-zinc-950 p-4 rounded-2xl font-mono text-[11px] border border-zinc-100 dark:border-zinc-800 text-zinc-500 uppercase tracking-wider">
-                        x-api-key: sk_reinfo_xxxxxxxxxxxx
+                     <div>
+                        <h3 className="text-lg font-light">Autenticación y Seguridad</h3>
+                        <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-light">Acceso Programático</p>
                      </div>
-                  </section>
+                  </div>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed font-light">
+                    Todas las peticiones a la API deben autenticarse mediante una Llave Secreta enviada en los encabezados HTTP.
+                  </p>
+                  <div className="bg-zinc-50 dark:bg-zinc-950 p-5 rounded-2xl font-mono text-[11px] border border-zinc-100 dark:border-zinc-800 text-zinc-400 flex justify-between items-center group">
+                     <code>x-api-key: {user?.apiKey || 'sk_reinfo_xxxxxxxxxxxx'}</code>
+                     <span className="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">Llave Activa</span>
+                  </div>
+               </section>
 
-                  {/* Endpoints & Status Section */}
-                  <section className="space-y-6">
-                     <h3 className="text-lg font-light px-2">Endpoint: Consulta REINFO</h3>
-                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm">
-                        <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/30">
-                           <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">GET</span>
-                              <code className="text-sm font-light opacity-80">/api/v1/registros?ruc=12345678901</code>
+               <div className="grid grid-cols-1 gap-12 mt-12">
+                  {/* Category 1: REINFO */}
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-light text-zinc-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                       <Database className="w-3 h-3" /> Catálogo REINFO
+                    </h3>
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] overflow-hidden shadow-sm">
+                        <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                               <span className="px-3 py-1 bg-blue-500 text-white text-[9px] font-medium rounded-lg uppercase tracking-widest">GET</span>
+                               <code className="text-[13px] font-light text-zinc-500">/api/v1/registros</code>
+                            </div>
+                            <span className="text-[10px] text-zinc-400 font-light italic">Consulta Principal</span>
+                        </div>
+                        <div className="p-6 space-y-4">
+                           <p className="text-xs font-light text-zinc-500">Búsqueda avanzada de mineros por RUC, Nombre o Código Único.</p>
+                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              {[
+                                { k: 'ruc', v: 'Filtro RUC' },
+                                { k: 'name', v: 'Nombre Minero' },
+                                { k: 'codigoUnico', v: 'Concesión' },
+                                { k: 'status', v: 'vigente | suspendido' }
+                              ].map(p => (
+                                <div key={p.k} className="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                                   <p className="text-[9px] text-blue-500 font-mono mb-1">{p.k}</p>
+                                   <p className="text-[10px] text-zinc-400 font-light">{p.v}</p>
+                                </div>
+                              ))}
                            </div>
                         </div>
-                        <div className="p-0">
-                           <table className="w-full text-left">
-                              <thead>
-                                 <tr className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-100 dark:border-zinc-800">
-                                    <th className="px-6 py-4 text-[10px] font-light text-zinc-400 uppercase tracking-widest">Estado</th>
-                                    <th className="px-6 py-4 text-[10px] font-light text-zinc-400 uppercase tracking-widest">Significado</th>
-                                    <th className="px-6 py-4 text-[10px] font-light text-zinc-400 uppercase tracking-widest">Respuesta Típica</th>
-                                 </tr>
-                              </thead>
-                              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 font-light">
-                                 <tr>
-                                    <td className="px-6 py-4 text-sm font-light text-blue-600">200 OK</td>
-                                    <td className="px-6 py-4 text-xs text-zinc-500">Consulta exitosa. Devuelve los datos del minero.</td>
-                                    <td className="px-6 py-4"><code className="text-[10px] bg-zinc-50 dark:bg-zinc-950 p-1 rounded font-light">{"{ success: true, data: [...] }"}</code></td>
-                                 </tr>
-                                 <tr>
-                                    <td className="px-6 py-4 text-sm font-light text-orange-600">401 Unauthorized</td>
-                                    <td className="px-6 py-4 text-xs text-zinc-500">API Key faltante, inválida o expirada.</td>
-                                    <td className="px-6 py-4"><code className="text-[10px] bg-zinc-50 dark:bg-zinc-950 p-1 rounded font-light">{"{ success: false, message: 'No autorizado' }"}</code></td>
-                                 </tr>
-                                 <tr>
-                                    <td className="px-6 py-4 text-sm font-light text-red-600">403 Forbidden</td>
-                                    <td className="px-6 py-4 text-xs text-zinc-500">Suscripción vencida o cuota de consultas agotada.</td>
-                                    <td className="px-6 py-4"><code className="text-[10px] bg-zinc-50 dark:bg-zinc-950 p-1 rounded font-light">{"{ success: false, message: 'Cuota excedida' }"}</code></td>
-                                 </tr>
-                                 <tr>
-                                    <td className="px-6 py-4 text-sm font-light text-zinc-400">500 Server Error</td>
-                                    <td className="px-6 py-4 text-xs text-zinc-500">Error interno en el servidor o caída de la base de datos.</td>
-                                    <td className="px-6 py-4"><code className="text-[10px] bg-zinc-50 dark:bg-zinc-950 p-1 rounded font-light">{"{ success: false, message: 'Error interno' }"}</code></td>
-                                 </tr>
-                              </tbody>
-                           </table>
-                        </div>
-                     </div>
-                  </section>
+                    </div>
+                  </div>
 
-                  {/* Code Example */}
+                  {/* Category 2: User Account */}
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-light text-zinc-400 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                       <User className="w-3 h-3" /> Cuenta de Usuario
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {[
+                          { m: 'GET', url: '/v1/user/usage', t: 'Consumo y Quota', desc: 'Obtiene saldo actual y vencimiento.' },
+                          { m: 'POST', url: '/v1/user/upgrade', t: 'Mejorar Plan', desc: 'Solicitud de upgrade corporativo.' },
+                          { m: 'POST', url: '/v1/user/reset-key', t: 'Regenerar API Key', desc: 'Invalida la llave actual.' },
+                          { m: 'POST', url: '/v1/auth/logout', t: 'Cerrar Sesión', desc: 'Invalida la sesión web (MFA).' }
+                        ].map(api => (
+                          <div key={api.url} className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] p-6 shadow-sm hover:shadow-md transition-all group">
+                             <div className="flex items-center justify-between mb-3">
+                                <span className={`px-2 py-0.5 rounded text-[8px] font-medium tracking-widest ${api.m === 'GET' ? 'bg-blue-50 text-blue-500' : 'bg-zinc-900 text-white'}`}>{api.m}</span>
+                             </div>
+                             <h4 className="text-xs font-medium text-zinc-900 dark:text-zinc-100 mb-1">{api.t}</h4>
+                             <code className="text-[10px] text-zinc-400 block mb-3">{api.url}</code>
+                             <p className="text-[11px] text-zinc-500 font-light">{api.desc}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Code Snippet */}
                   <section className="space-y-4">
-                     <h3 className="text-lg font-light px-2">Ejemplo de Integración (cURL)</h3>
-                     <div className="bg-zinc-900 text-zinc-400 p-6 rounded-3xl font-mono text-[12px] leading-relaxed relative group overflow-hidden border border-zinc-800">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-50" />
-                        <span className="text-zinc-500"># Consultar por RUC</span><br/>
-                         curl -X GET <span className="text-blue-400">"{process.env.NEXT_PUBLIC_API_URL}/registros?ruc=20100100101"</span> \<br/>
-                         &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">"x-api-key: TU_API_KEY_AQUI"</span>
+                     <h3 className="text-xs font-light text-zinc-400 uppercase tracking-[0.2em] px-2">Integración Estándar (cURL)</h3>
+                     <div className="bg-zinc-900 text-zinc-400 p-8 rounded-[32px] font-mono text-[12px] leading-relaxed relative group overflow-hidden border border-zinc-800 shadow-2xl">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-30" />
+                        <span className="text-zinc-600"># Búsqueda corporativa por RUC</span><br/>
+                         curl -X GET <span className="text-blue-400">"{process.env.NEXT_PUBLIC_API_URL || 'https://api-reinfo.com'}/api/v1/registros?ruc=20100100101"</span> \<br/>
+                         &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">"x-api-key: {user?.apiKey || 'TU_API_KEY_AQUI'}"</span>
                      </div>
                   </section>
                </div>
