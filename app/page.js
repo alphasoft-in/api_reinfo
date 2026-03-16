@@ -765,21 +765,24 @@ export default function Home() {
                            <div className="flex items-center justify-end gap-3">
                               <div className="flex flex-col gap-1 items-end">
                                 <label className="text-[9px] font-light text-zinc-400">PLAN</label>
-                                <select 
-                                  value={u.plan}
-                                  onChange={(e) => handleUpdateUser(u.id, { 
-                                    plan: e.target.value, 
-                                    quota_limit: e.target.value === 'ENTERPRISE' ? 1000000 : e.target.value === 'PROFESSIONAL' ? 10000 : 5, 
-                                    active: u.active, 
-                                    role: u.role,
-                                    payment_status: u.payment_status 
-                                  })}
-                                  className="text-[11px] font-light bg-zinc-50 dark:bg-zinc-800 border-none rounded-lg h-8 pl-2 pr-8 focus:ring-0"
-                                >
-                                  <option value="FREE">FREE</option>
-                                  <option value="PROFESSIONAL">PRO</option>
-                                  <option value="ENTERPRISE">ENT</option>
-                                </select>
+                                <div className="relative group/sel">
+                                  <select 
+                                    value={u.plan}
+                                    onChange={(e) => handleUpdateUser(u.id, { 
+                                      plan: e.target.value, 
+                                      quota_limit: e.target.value === 'ENTERPRISE' ? 1000000 : e.target.value === 'PROFESSIONAL' ? 10000 : 5, 
+                                      active: u.active, 
+                                      role: u.role,
+                                      payment_status: u.payment_status 
+                                    })}
+                                    className="appearance-none text-[11px] font-light bg-zinc-50 dark:bg-zinc-800 border-none rounded-lg h-8 pl-2 pr-8 focus:ring-0 w-full cursor-pointer"
+                                  >
+                                    <option value="FREE">FREE</option>
+                                    <option value="PROFESSIONAL">PRO</option>
+                                    <option value="ENTERPRISE">ENT</option>
+                                  </select>
+                                  <ChevronDown className="w-3 h-3 text-zinc-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none group-hover/sel:text-zinc-600 transition-colors" />
+                                </div>
                               </div>
 
                               <button 
@@ -900,14 +903,17 @@ export default function Home() {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Plan de Acceso</label>
-                            <select 
-                              name="plan" defaultValue={editingUser.plan}
-                              className="w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
-                            >
-                              <option value="FREE">FREE</option>
-                              <option value="PROFESSIONAL">PROFESSIONAL</option>
-                              <option value="ENTERPRISE">ENTERPRISE</option>
-                            </select>
+                            <div className="relative">
+                              <select 
+                                name="plan" defaultValue={editingUser.plan}
+                                className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
+                              >
+                                <option value="FREE">FREE</option>
+                                <option value="PROFESSIONAL">PROFESSIONAL</option>
+                                <option value="ENTERPRISE">ENTERPRISE</option>
+                              </select>
+                              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Cupo de Consultas</label>
