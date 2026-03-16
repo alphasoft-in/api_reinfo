@@ -27,7 +27,10 @@ import {
   Edit3,
   CreditCard,
   ShieldAlert,
-  ArrowRight
+  ArrowRight,
+  Trash2,
+  Pencil,
+  X
 } from "lucide-react";
 import axios from "axios";
 
@@ -41,6 +44,8 @@ export default function Home() {
   const [usage, setUsage] = useState(null);
   const [adminUsers, setAdminUsers] = useState([]);
   const [adminError, setAdminError] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -299,6 +304,16 @@ export default function Home() {
     try {
       const res = await axios.post("/api/v1/admin/users", { userId, ...updates });
       if (res.data.success) fetchAdminUsers();
+    } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      const res = await axios.delete(`/api/v1/admin/users?id=${userId}`);
+      if (res.data.success) {
+        fetchAdminUsers();
+        setShowDeleteConfirm(null);
+      }
     } catch (err) { console.error(err); }
   };
 
@@ -792,6 +807,23 @@ export default function Home() {
                               >
                                 {u.payment_status === 'active' ? 'ANULAR PAGO' : u.payment_status === 'pending_approval' ? 'APROBAR Y ACTIVAR' : 'APROBAR PAGO'}
                               </button>
+
+                              <div className="flex items-center gap-1 border-l border-zinc-100 dark:border-zinc-800 pl-3 ml-1">
+                                <button 
+                                  onClick={() => setEditingUser(u)}
+                                  className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                                  title="Editar Detalles"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => setShowDeleteConfirm(u)}
+                                  className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-zinc-400 hover:text-red-600 transition-colors"
+                                  title="Eliminar Cliente"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                            </div>
                         </td>
                       </tr>
@@ -799,6 +831,112 @@ export default function Home() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Delete Confirmation Modal */}
+              {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="w-14 h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center">
+                        <Trash2 className="w-7 h-7 text-red-600" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-light">Eliminar Cliente</h3>
+                        <p className="text-sm text-zinc-500 font-light">
+                          ¿Estás seguro de eliminar a <span className="font-medium text-zinc-900 dark:text-zinc-100">{showDeleteConfirm.email || showDeleteConfirm.username}</span>?
+                          <br />Esta acción es irreversible y borrará todos sus logs de consulta.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mt-8">
+                      <button 
+                        onClick={() => setShowDeleteConfirm(null)}
+                        className="h-11 rounded-xl text-sm font-light border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                      >
+                        Cancelar
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteUser(showDeleteConfirm.id)}
+                        className="h-11 rounded-xl text-sm font-light bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                      >
+                        Eliminar Ahora
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Edit User Modal */}
+              {editingUser && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-200">
+                  <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                     <div className="flex items-center justify-between mb-8">
+                       <h3 className="text-xl font-light">Detalles del Cliente</h3>
+                       <button onClick={() => setEditingUser(null)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+                          <X className="w-5 h-5 text-zinc-400" />
+                       </button>
+                     </div>
+                     
+                     <form onSubmit={(e) => {
+                       e.preventDefault();
+                       handleUpdateUser(editingUser.id, {
+                         email: e.target.email.value,
+                         quota_limit: parseInt(e.target.quota.value),
+                         plan: e.target.plan.value,
+                         active: editingUser.active,
+                         role: editingUser.role,
+                         payment_status: editingUser.payment_status
+                       });
+                       setEditingUser(null);
+                     }} className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Identidad Corporativa (Email)</label>
+                          <input 
+                            name="email" type="email" defaultValue={editingUser.email || editingUser.username} required 
+                            className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Plan de Acceso</label>
+                            <select 
+                              name="plan" defaultValue={editingUser.plan}
+                              className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
+                            >
+                              <option value="FREE">FREE</option>
+                              <option value="PROFESSIONAL">PROFESSIONAL</option>
+                              <option value="ENTERPRISE">ENTERPRISE</option>
+                            </select>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Cupo de Consultas</label>
+                            <input 
+                              name="quota" type="number" defaultValue={editingUser.quota_limit} required 
+                              className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4 flex gap-3">
+                          <button 
+                            type="button"
+                            onClick={() => setEditingUser(null)}
+                            className="flex-1 h-12 rounded-xl text-sm font-light border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                          >
+                            Cancelar
+                          </button>
+                          <button 
+                            type="submit"
+                            className="flex-1 h-12 rounded-xl text-sm font-light bg-zinc-900 text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900 transition-all shadow-xl shadow-zinc-900/10"
+                          >
+                            Guardar Cambios
+                          </button>
+                        </div>
+                     </form>
+                  </div>
+                </div>
+              )}
             </div>
           ) : activeTab === 'settings' ? (
             <div className="max-w-3xl mx-auto space-y-10 pb-20">

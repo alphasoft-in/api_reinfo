@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { getAllUsers, adminUpdateUser, getUserByUsername, initDb } from '@/lib/db';
+import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser } from '@/lib/db';
 
 const validateAdmin = async (request) => {
     const authHeader = request.headers.get('authorization');
@@ -84,6 +84,27 @@ export async function POST(request) {
         await adminUpdateUser(userId, updates);
         return NextResponse.json({ success: true, message: 'Usuario actualizado correctamente' });
     } catch (error) {
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    }
+}
+export async function DELETE(request) {
+    const auth = await validateAdmin(request);
+    if (auth.error) {
+        return NextResponse.json({ success: false, message: auth.error }, { status: 401 });
+    }
+
+    try {
+        const { searchParams } = new URL(request.url);
+        const userId = searchParams.get('id');
+        
+        if (!userId) {
+            return NextResponse.json({ success: false, message: 'ID de usuario requerido' }, { status: 400 });
+        }
+
+        await deleteUser(userId);
+        return NextResponse.json({ success: true, message: 'Usuario eliminado exitosamente' });
+    } catch (error) {
+        console.error('Admin API DELETE ERROR:', error);
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }
