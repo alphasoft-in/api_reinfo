@@ -101,19 +101,22 @@ export default function Home() {
       fetchNotifications();
       
       // Load data and config
+      const isDataTableTab = ['dashboard', 'vigentes', 'suspendidos'].includes(activeTab);
+
       if (user?.role === 'superadmin') {
-        if (activeTab === 'admin' || activeTab === 'dashboard') {
-          console.log('Tab change/Effect: fetching admin users');
+        if (activeTab === 'admin' || isDataTableTab) {
           fetchAdminUsers();
         }
         fetchPlanes();
-        if (activeTab === 'dashboard') fetchData();
+        if (isDataTableTab) fetchData();
       } else {
         fetchPlanes();
-        if (activeTab === 'dashboard' && (query || hasSearched)) {
-          fetchData();
-        } else if (activeTab === 'dashboard') {
-          setData([]); 
+        if (isDataTableTab) {
+          if (query || hasSearched) {
+            fetchData();
+          } else {
+            setData([]); 
+          }
         }
       }
     }
