@@ -604,7 +604,7 @@ export default function Home() {
                   <div className="h-[1px] bg-zinc-100 dark:bg-zinc-800 my-2 mx-1" />
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-light text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all">
                     <LogOut className="w-4 h-4" />
-                    Cerrar Sesión Corporativa
+                    Cerrar Sesión
                   </button>
                 </div>
               )}
