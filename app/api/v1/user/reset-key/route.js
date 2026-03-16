@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import crypto from 'crypto';
 import { verifyToken } from '@/lib/auth';
 import { getUserByUsername, getSql } from '@/lib/db';
 
@@ -22,7 +23,7 @@ export async function POST() {
             return NextResponse.json({ success: false, message: 'Usuario no encontrado' }, { status: 404 });
         }
 
-        const newApiKey = 'sk_reinfo_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const newApiKey = 'sk_reinfo_' + crypto.randomBytes(24).toString('hex');
         
         const sql = getSql();
         await sql`UPDATE usuarios SET api_key = ${newApiKey} WHERE id = ${user.id}`;

@@ -45,12 +45,17 @@ export async function GET(request) {
     const { user } = auth;
 
     // Quota and Subscription Check - Universal check for all modes
-    // 1. Plan/Expiry check
+    // 1. Account suspended check
+    if (!user.active) {
+        return NextResponse.json({ success: false, message: 'Cuenta suspendida. Por favor, renueve su suscripción.' }, { status: 403 });
+    }
+
+    // 2. Plan/Expiry check
     if (user.subscription_end && new Date(user.subscription_end) < new Date()) {
         return NextResponse.json({ success: false, message: 'Suscripción expirada' }, { status: 403 });
     }
 
-    // 2. Quota check
+    // 3. Quota check
     if (user.quota_used >= user.quota_limit) {
         return NextResponse.json({ success: false, message: 'Cuota de consultas excedida' }, { status: 403 });
     }
@@ -61,7 +66,8 @@ export async function GET(request) {
         const name = searchParams.get('name');
         const codigoUnico = searchParams.get('codigoUnico');
         const status = searchParams.get('status');
-        const limit = parseInt(searchParams.get('limit')) || 25;
+        let limit = parseInt(searchParams.get('limit')) || 25;
+        if (limit > 100) limit = 100; // Enforce max limit to prevent DoS
         const offset = parseInt(searchParams.get('offset')) || 0;
 
         // Restriction: Normal users MUST provide a search filter

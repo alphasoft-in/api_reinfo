@@ -910,8 +910,8 @@ export default function Home() {
                      <div className="bg-zinc-900 text-zinc-400 p-6 rounded-3xl font-mono text-[12px] leading-relaxed relative group overflow-hidden border border-zinc-800">
                         <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-50" />
                         <span className="text-zinc-500"># Consultar por RUC</span><br/>
-                        curl -X GET <span className="text-emerald-400">"{process.env.NEXT_PUBLIC_API_URL}/registros?ruc=20100100101"</span> \<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">"x-api-key: TU_API_KEY_AQUI"</span>
+                        curl -X GET <span className="text-emerald-400">&quot;{process.env.NEXT_PUBLIC_API_URL}/registros?ruc=20100100101&quot;</span> \<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">&quot;x-api-key: TU_API_KEY_AQUI&quot;</span>
                      </div>
                   </section>
                </div>

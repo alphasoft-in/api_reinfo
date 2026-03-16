@@ -19,10 +19,9 @@ const validateAdmin = async (request) => {
     
     const decoded = verifyToken(token);
     if (!decoded) return { error: 'Token inválido o expirado' };
-    
-    if (decoded.role === 'superadmin') return { user: decoded };
 
-    // Fallback: Check DB in case role changed but JWT is old
+    // Fetch fresh user data to ensure role is up-to-date and to prevent
+    // demoted admins from retaining access using an old token.
     const user = await getUserByUsername(decoded.username);
     if (user && user.role === 'superadmin') return { user };
 
