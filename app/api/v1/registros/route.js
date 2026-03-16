@@ -44,6 +44,11 @@ export async function GET(request) {
 
     const { user } = auth;
 
+    // Block usage for suspended accounts (User can login but NOT query)
+    if (user.role !== 'superadmin' && !user.active) {
+        return NextResponse.json({ success: false, message: 'Cuenta suspendida - Regularice su suscripción' }, { status: 403 });
+    }
+
     // Quota and Subscription Check - Universal check for all modes
     // 1. Plan/Expiry check
     if (user.subscription_end && new Date(user.subscription_end) < new Date()) {

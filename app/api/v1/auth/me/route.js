@@ -18,8 +18,8 @@ export async function GET() {
         }
 
         const user = await getUserByUsername(decoded.username);
-        if (!user || !user.active) {
-            return NextResponse.json({ success: false, message: 'User not found or inactive' }, { status: 401 });
+        if (!user) {
+            return NextResponse.json({ success: false, message: 'User not found' }, { status: 401 });
         }
 
         return NextResponse.json({
@@ -29,6 +29,7 @@ export async function GET() {
                 email: user.email,
                 role: user.role,
                 apiKey: user.api_key,
+                active: user.active,
                 quota: {
                     limit: user.quota_limit,
                     used: user.quota_used

@@ -361,8 +361,8 @@ export default function Home() {
               )}
               <button 
                 type="submit"
-                disabled={loading}
-                className="w-full h-12 bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 font-light rounded-xl hover:opacity-90 transition-all shadow-lg shadow-zinc-900/10 dark:shadow-none disabled:opacity-50"
+                disabled={loading || (user?.active === false && user?.role !== 'superadmin')}
+                className={`w-full h-12 rounded-xl transition-all shadow-lg ${user?.active === false && user?.role !== 'superadmin' ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed' : 'bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 font-light hover:opacity-90 shadow-zinc-900/10 dark:shadow-none'}`}
               >
                 {loading ? 'Procesando...' : mfaRequired ? 'Verificar Código' : isRegistering ? 'Registrar Empresa' : 'Continuar'}
               </button>
@@ -958,6 +958,24 @@ export default function Home() {
             </div>
           ) : (
             <>
+            {user?.active === false && user?.role !== 'superadmin' && (
+              <div className="mb-8 p-4 bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-800/50 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-orange-900 dark:text-orange-400">Cuenta en Pausa / Suspendida</h3>
+                  <p className="text-[11px] text-orange-700 dark:text-orange-500 font-light">Su acceso a la API y consultas ha sido restringido temporalmente. Por favor, regularice su pago o cambie de plan para continuar.</p>
+                </div>
+                <button 
+                  onClick={() => setActiveTab('planes')}
+                  className="ml-auto px-4 py-2 bg-orange-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-orange-700 transition-all"
+                >
+                  Ver Planes
+                </button>
+              </div>
+            )}
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-light tracking-normal">

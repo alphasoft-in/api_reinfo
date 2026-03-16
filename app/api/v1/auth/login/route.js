@@ -61,9 +61,12 @@ export async function POST(request) {
             );
         }
 
+        // login/route.js: Allow login even if inactive, we will handle UI warning on frontend
+        /*
         if (!user.active) {
             return NextResponse.json({ success: false, message: 'Cuenta suspendida' }, { status: 403 });
         }
+        */
 
         // 3. Success: Reset stats and set Session
         await updateLoginStats(user.id, 0, null);
@@ -104,6 +107,7 @@ export async function POST(request) {
                     limit: user.quota_limit,
                     used: user.quota_used
                 },
+                active: user.active,
                 two_factor_enabled: user.two_factor_enabled
             }
         });
