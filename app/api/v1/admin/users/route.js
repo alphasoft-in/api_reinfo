@@ -89,6 +89,11 @@ export async function POST(request) {
             
             updates.quota_limit = quotaLimit;
             
+            // Clear payment details
+            updates.payment_amount = null;
+            updates.payment_type = null;
+            updates.payment_reference = null;
+            
             // Record in subscription history
             const startDate = new Date();
             const endDate = new Date();

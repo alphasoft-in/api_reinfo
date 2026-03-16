@@ -63,6 +63,8 @@ export default function Home() {
   const [plansConfig, setPlansConfig] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
   const [subHistory, setSubHistory] = useState([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [pendingUpgradePlan, setPendingUpgradePlan] = useState(null);
 
   useEffect(() => {
     checkSession();
@@ -279,16 +281,28 @@ export default function Home() {
     const planKey = planName.toUpperCase();
     if (usage?.user?.plan === planKey) return;
     
+    // Instead of immediate upgrade, show payment modal
+    setPendingUpgradePlan(planName);
+    setShowUpgradeModal(true);
+  };
+
+  const handleUpgradeSubmit = async (paymentData) => {
     setLoading(true);
     try {
-      const res = await axios.post("/api/v1/user/upgrade", { plan: planKey });
+      const res = await axios.post("/api/v1/user/upgrade", { 
+        plan: pendingUpgradePlan.toUpperCase(),
+        ...paymentData
+      });
       if (res.data.success) {
         await fetchUsage();
         await checkSession();
+        setShowUpgradeModal(false);
+        setPendingUpgradePlan(null);
         setActiveTab("dashboard");
       }
     } catch (err) {
       console.error(err);
+      alert(err.response?.data?.message || "Error al procesar la solicitud.");
     } finally {
       setLoading(false);
     }
@@ -950,6 +964,29 @@ export default function Home() {
                               />
                             </div>
                           </div>
+
+                          {editingUser.payment_status === 'pending_approval' && editingUser.payment_amount && (
+                            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2">
+                               <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                                  <CreditCard className="w-4 h-4" />
+                                  <span className="text-[10px] font-bold uppercase tracking-widest">Pago Reportado por Cliente</span>
+                               </div>
+                               <div className="grid grid-cols-3 gap-4">
+                                  <div>
+                                     <p className="text-[9px] text-zinc-400 uppercase mb-1">Monto</p>
+                                     <p className="text-sm font-mono text-zinc-900 dark:text-zinc-100">${editingUser.payment_amount}</p>
+                                  </div>
+                                  <div>
+                                     <p className="text-[9px] text-zinc-400 uppercase mb-1">Tipo</p>
+                                     <p className="text-xs text-zinc-900 dark:text-zinc-100">{editingUser.payment_type}</p>
+                                  </div>
+                                  <div>
+                                     <p className="text-[9px] text-zinc-400 uppercase mb-1">Referencia</p>
+                                     <p className="text-xs font-mono text-zinc-900 dark:text-zinc-100">{editingUser.payment_reference}</p>
+                                  </div>
+                               </div>
+                            </div>
+                          )}
                         
                         <div className="pt-4 flex gap-3">
                           <button 
@@ -1413,6 +1450,7 @@ export default function Home() {
                     fetchStats();
                     fetchAdminUsers();
                   } else {
+                    fetchUsage();
                     fetchSubHistory();
                   }
                   if (query || hasSearched) fetchData();
@@ -1648,6 +1686,82 @@ export default function Home() {
             </div>
           )}
         </>
+      )}
+      {/* Upgrade Payment Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[40px] border border-zinc-200 dark:border-zinc-800 p-10 shadow-2xl animate-in zoom-in-95 duration-300">
+              <div className="flex flex-col items-center text-center space-y-4 mb-8">
+                 <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-3xl flex items-center justify-center">
+                    <CreditCard className="w-8 h-8 text-blue-600" />
+                 </div>
+                 <div className="space-y-1">
+                    <h3 className="text-2xl font-light">Solicitar Plan {pendingUpgradePlan}</h3>
+                    <p className="text-sm text-zinc-500 font-light">Complete los detalles de su transferencia para activar el servicio.</p>
+                 </div>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleUpgradeSubmit({
+                  amount: e.target.amount.value,
+                  type: e.target.type.value,
+                  reference: e.target.reference.value
+                });
+              }} className="space-y-6">
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Monto Transferido (USD)</label>
+                    <input 
+                      name="amount" type="text" required 
+                      placeholder="Ej: 49.00"
+                      className="w-full h-12 px-5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-lg font-light focus:outline-none focus:border-blue-500 transition-all font-mono"
+                    />
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Medio / Tipo</label>
+                       <div className="relative">
+                          <select 
+                            name="type" required
+                            className="appearance-none w-full h-12 pl-5 pr-10 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-sm font-light focus:outline-none focus:border-blue-500 transition-all cursor-pointer"
+                          >
+                             <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                             <option value="Depósito en Cuenta">Depósito en Cuenta</option>
+                             <option value="PayPal / Otros">PayPal / Otros</option>
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">N° Operación / Referencia</label>
+                       <input 
+                         name="reference" type="text" required 
+                         placeholder="Ej: 123456789"
+                         className="w-full h-12 px-5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-sm font-light focus:outline-none focus:border-blue-500 transition-all"
+                       />
+                    </div>
+                 </div>
+
+                 <div className="pt-4 flex gap-4">
+                    <button 
+                      type="button"
+                      onClick={() => setShowUpgradeModal(false)}
+                      className="flex-1 h-14 rounded-2xl text-[11px] font-medium border border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all uppercase tracking-widest"
+                    >
+                       Cancelar
+                    </button>
+                    <button 
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 h-14 rounded-2xl text-[11px] font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all uppercase tracking-widest shadow-xl shadow-blue-600/20 disabled:opacity-50"
+                    >
+                       {loading ? 'Procesando...' : 'Confirmar Reporte'}
+                    </button>
+                 </div>
+              </form>
+           </div>
+        </div>
       )}
     </div>
   </main>
