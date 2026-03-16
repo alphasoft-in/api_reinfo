@@ -929,28 +929,47 @@ export default function Home() {
                     { name: 'Professional', price: '49', limit: '10,000', features: ['10k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
                     { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Consultas Ilimitadas*', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
                   ].map((plan, i) => (
-                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-sm' : 'border-zinc-100 dark:border-zinc-800'} rounded-[32px] p-10 flex flex-col relative ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
-                       {usage?.user?.plan === plan.name.toUpperCase() && <div className="absolute -top-3 left-10 bg-emerald-500 text-white text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">Plan Activo</div>}
-                       {plan.name === 'Professional' && plan.name.toUpperCase() !== usage?.user?.plan && <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-light px-2.5 py-1 rounded-full uppercase tracking-[0.3em]">Popular</div>}
-                       <h4 className="text-[10px] font-light text-zinc-400 uppercase tracking-[0.3em] mb-3">{plan.name}</h4>
-                       <div className="flex items-baseline gap-1 mb-6">
-                          <span className="text-2xl font-extralight font-mono text-zinc-900 dark:text-zinc-100">${plan.price}</span>
-                          <span className="text-[10px] text-zinc-400 font-light">/mes</span>
+                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none' : 'border-zinc-100 dark:border-zinc-800 shadow-sm'} rounded-[32px] p-10 flex flex-col relative transition-all duration-500 hover:scale-[1.02] ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
+                       {usage?.user?.plan === plan.name.toUpperCase() && (
+                         <div className="absolute -top-3 left-10 bg-emerald-500 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20 animate-in fade-in zoom-in">
+                           Suscripción Activa
+                         </div>
+                       )}
+                       {plan.name === 'Professional' && plan.name.toUpperCase() !== usage?.user?.plan && (
+                         <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-bold px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-zinc-900/10">
+                           Recomendado
+                         </div>
+                       )}
+                       
+                       <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-3">{plan.name}</h4>
+                       <div className="flex items-baseline gap-1 mb-8">
+                          <span className="text-4xl font-extralight tracking-tight text-zinc-900 dark:text-zinc-100">${plan.price}</span>
+                          <span className="text-[11px] text-zinc-400 font-light">/mes</span>
                        </div>
-                       <ul className="space-y-3 mb-8 flex-1">
+
+                       <div className="h-[1px] bg-zinc-100 dark:bg-zinc-800 w-full mb-8" />
+
+                       <ul className="space-y-4 mb-10 flex-1">
                           {plan.features.map((f, j) => (
-                            <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-500 dark:text-zinc-400 font-light">
-                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30 shrink-0" />
+                            <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-600 dark:text-zinc-400 font-light">
+                               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 opacity-80" />
                                {f}
                             </li>
                           ))}
                        </ul>
+
                         <button 
                           onClick={() => handlePlanSelect(plan.name)}
                           disabled={loading || usage?.user?.plan === plan.name.toUpperCase()}
-                          className={`w-full py-3.5 rounded-2xl text-[10px] font-extralight transition-all uppercase tracking-[0.4em] ${usage?.user?.plan === plan.name.toUpperCase() ? 'text-zinc-300 cursor-not-allowed border border-zinc-50' : plan.name === 'Professional' ? 'bg-zinc-800 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:bg-black' : 'bg-transparent text-zinc-500 hover:text-zinc-900 border border-zinc-100 hover:bg-zinc-50'}`}
+                          className={`w-full py-4 rounded-2xl text-[10px] font-bold transition-all uppercase tracking-[0.2em] shadow-md ${
+                            usage?.user?.plan === plan.name.toUpperCase() 
+                              ? 'bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100' 
+                              : plan.name === 'Professional' 
+                                ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
+                                : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
+                          }`}
                         >
-                           {usage?.user?.plan === plan.name.toUpperCase() ? 'Plan Actual' : loading ? 'Procesando...' : 'Seleccionar'}
+                           {usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : loading ? 'Procesando...' : 'Obtener Acceso'}
                         </button>
                     </div>
                   ))}
