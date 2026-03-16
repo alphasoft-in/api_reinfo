@@ -529,25 +529,22 @@ export default function Home() {
                 value={query} 
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Filtrar por RUC o Titular..."
-                className="flex-1 bg-transparent border-none py-3 text-sm focus:ring-0 outline-none placeholder:text-zinc-400"
+                className="flex-1 bg-transparent border-none py-3.5 text-sm focus:ring-0 outline-none placeholder:text-zinc-400"
               />
-              <div className="pr-1.5 py-1.5 flex items-center shrink-0">
+              <div className="flex items-center self-stretch">
                 <button 
                   type="submit"
                   disabled={loading || !query.trim()}
-                  className={`h-9 px-4 rounded-xl flex items-center gap-2 transition-all active:scale-95 disabled:opacity-0 disabled:translate-x-4 disabled:pointer-events-none ${
+                  className={`w-14 h-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-0 disabled:translate-x-4 disabled:pointer-events-none rounded-r-2xl border-l border-zinc-200 dark:border-zinc-800 ${
                     loading 
                       ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400' 
-                      : 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200'
+                      : 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-[-10px_0_20px_-10px_rgba(0,0,0,0.1)]'
                   }`}
                 >
                   {loading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
-                    <>
-                      <span className="text-[10px] uppercase tracking-wider hidden sm:inline">Consultar</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
+                    <Search className="w-4 h-4" />
                   )}
                 </button>
               </div>
