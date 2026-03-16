@@ -50,8 +50,28 @@ export async function POST(request) {
     }
 
     try {
-        const { userId, plan, quota_limit, subscription_end, active, role, payment_status } = await request.json();
-        await adminUpdateUser(userId, { plan, quota_limit, subscription_end, active, role, payment_status });
+        const updates = await request.json();
+        const { userId } = updates;
+        
+        // If we are activating payment and there's a requested plan, apply it
+        if (updates.payment_status === 'active' && updates.requested_plan) {
+            updates.plan = updates.requested_plan;
+            updates.requested_plan = null;
+            
+            // Set quota based on actual plan configuration in DB
+            const planesList = await getPlanes();
+            const matchingPlan = planesList.find(p => p.name.toUpperCase() === updates.plan.toUpperCase());
+            
+            if (matchingPlan) {
+                updates.quota_limit = Number(matchingPlan.limit.replace(/,/g, ''));
+            } else {
+                // Fallback
+                const fallbackQuotas = { 'FREE': 5, 'PROFESSIONAL': 10000, 'ENTERPRISE': 1000000 };
+                updates.quota_limit = fallbackQuotas[updates.plan.toUpperCase()] || 5;
+            }
+        }
+
+        await adminUpdateUser(userId, updates);
         return NextResponse.json({ success: true, message: 'Usuario actualizado correctamente' });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });

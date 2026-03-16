@@ -29,19 +29,17 @@ export async function POST(request) {
 
         const quotaLimit = quotas[plan.toUpperCase()] || 100;
         
-        // Update user (In a real app, this would happen AFTER payment)
+        // Update user: only register the request
         await adminUpdateUser(user.id, {
-            plan: plan.toUpperCase(),
-            quota_limit: quotaLimit,
-            subscription_end: user.subscription_end, // Keep current or extend
-            active: true,
-            role: user.role
+            ...user,
+            requested_plan: plan.toUpperCase(),
+            payment_status: 'pending_approval'
         });
-
+ 
         return NextResponse.json({ 
             success: true, 
-            message: `Plan actualizado a ${plan}`,
-            user: { ...user, plan: plan.toUpperCase(), quota_limit: quotaLimit }
+            message: `Solicitud de plan ${plan} registrada. Pendiente de aprobación del administrador.`,
+            user: { ...user, requested_plan: plan.toUpperCase(), payment_status: 'pending_approval' }
         });
 
     } catch (error) {

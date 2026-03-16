@@ -26,7 +26,8 @@ import {
   ShieldCheck,
   Edit3,
   CreditCard,
-  ShieldAlert
+  ShieldAlert,
+  ArrowRight
 } from "lucide-react";
 import axios from "axios";
 
@@ -84,16 +85,17 @@ export default function Home() {
     if (isLoggedIn) {
       fetchStats();
       fetchUsage();
+      
+      // Load data and config
       if (user?.role === 'superadmin') {
         fetchAdminUsers();
-        fetchData(); // Admins load data automatically
         fetchPlanes();
+        if (activeTab === 'dashboard') fetchData();
       } else {
         fetchPlanes();
-        if (query || hasSearched) {
-          // Regular users only load if searching/requested
+        if (activeTab === 'dashboard' && (query || hasSearched)) {
           fetchData();
-        } else {
+        } else if (activeTab === 'dashboard') {
           setData([]); 
         }
       }
@@ -286,9 +288,12 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPage(1);
-    setHasSearched(true);
-    fetchData();
+    if (query.trim()) {
+      setHasSearched(true);
+      setPage(1);
+      // Removed direct fetchData() call to avoid double increment
+      // setHasSearched(true) will trigger the useEffect to call fetchData()
+    }
   };
 
   const handleBrowseAll = () => {
@@ -512,13 +517,40 @@ export default function Home() {
         {/* Header Console */}
         <header className="h-20 flex items-center justify-between px-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
           <div className="flex-1 max-w-xl">
-            <form onSubmit={handleSearch} className="relative group">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-zinc-900 dark:group-focus-within:text-zinc-100 transition-colors" />
+            <form 
+              onSubmit={handleSearch} 
+              className="relative flex items-center bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus-within:ring-1 focus-within:ring-zinc-900 dark:focus-within:ring-zinc-100 focus-within:border-zinc-900 dark:focus-within:border-zinc-100 focus-within:bg-white dark:focus-within:bg-zinc-900 transition-all shadow-inner overflow-hidden group"
+            >
+              <div className="pl-4 pr-2 py-2 flex items-center justify-center shrink-0">
+                <Search className={`w-4 h-4 transition-colors ${query ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400'}`} />
+              </div>
               <input 
-                type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                type="text" 
+                value={query} 
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Filtrar por RUC o Titular..."
-                className="w-full h-11 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-11 py-1 text-sm rounded-2xl focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:focus:ring-zinc-100 focus:bg-white dark:focus:bg-zinc-900 transition-all"
+                className="flex-1 bg-transparent border-none py-3 text-sm focus:ring-0 outline-none placeholder:text-zinc-400"
               />
+              <div className="pr-1.5 py-1.5 flex items-center shrink-0">
+                <button 
+                  type="submit"
+                  disabled={loading || !query.trim()}
+                  className={`h-9 px-4 rounded-xl flex items-center gap-2 transition-all active:scale-95 disabled:opacity-0 disabled:translate-x-4 disabled:pointer-events-none ${
+                    loading 
+                      ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400' 
+                      : 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200'
+                  }`}
+                >
+                  {loading ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <span className="text-[10px] uppercase tracking-wider hidden sm:inline">Consultar</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
 
@@ -648,9 +680,12 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4">
                            <div className="flex flex-col gap-1">
-                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black w-fit ${u.payment_status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
-                                {u.payment_status === 'active' ? 'PAGO VERIFICADO' : 'PAGO PENDIENTE'}
+                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black w-fit ${u.payment_status === 'active' ? 'bg-blue-100 text-blue-700' : u.payment_status === 'pending_approval' ? 'bg-amber-100 text-amber-700 animate-pulse' : 'bg-orange-100 text-orange-700'}`}>
+                                {u.payment_status === 'active' ? 'PAGO VERIFICADO' : u.payment_status === 'pending_approval' ? 'PENDIENTE APROBACIÓN' : 'PAGO PENDIENTE'}
                              </span>
+                             {u.requested_plan && (
+                               <span className="text-[9px] text-zinc-400 font-light italic">Solicito: {u.requested_plan}</span>
+                             )}
                            </div>
                         </td>
                         <td className="px-6 py-4">
@@ -698,11 +733,12 @@ export default function Home() {
                                   ...u, 
                                   payment_status: u.payment_status === 'active' ? 'pending' : 'active',
                                   subscription_end: u.subscription_end,
-                                  quota_limit: u.quota_limit
+                                  quota_limit: u.quota_limit,
+                                  requested_plan: u.requested_plan // Logic in server will handle the swap
                                 })}
-                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.payment_status === 'active' ? 'bg-zinc-50 text-zinc-400 border-transparent italic' : 'bg-zinc-800 text-zinc-100 shadow-lg shadow-zinc-900/10'}`}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.payment_status === 'active' ? 'bg-zinc-50 text-zinc-400 border-transparent italic' : u.payment_status === 'pending_approval' ? 'bg-blue-600 text-white border-transparent' : 'bg-zinc-800 text-zinc-100 shadow-lg shadow-zinc-900/10'}`}
                               >
-                                {u.payment_status === 'active' ? 'ANULAR PAGO' : 'APROBAR PAGO'}
+                                {u.payment_status === 'active' ? 'ANULAR PAGO' : u.payment_status === 'pending_approval' ? 'APROBAR Y ACTIVAR' : 'APROBAR PAGO'}
                               </button>
                            </div>
                         </td>
@@ -1025,28 +1061,39 @@ export default function Home() {
                        </div>
 
                        <ul className="space-y-4 mb-10 flex-1">
-                          {plan.features.map((f, j) => (
-                            <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-600 dark:text-zinc-400 font-light">
-                               <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 opacity-80" />
-                               {f}
-                            </li>
-                          ))}
+                           {plan.features.map((f, j) => {
+                             // Dynamic feature text for limit
+                             let featureText = f;
+                             if (j === 0) {
+                               const limitNum = Number((plan.limit || '0').toString().replace(/,/g, ''));
+                               if (limitNum >= 1000000) featureText = "Consultas Ilimitadas*";
+                               else featureText = `${limitNum.toLocaleString()} Consultas Mensuales`;
+                             }
+                             return (
+                               <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-600 dark:text-zinc-400 font-light">
+                                  <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 opacity-80" />
+                                  {featureText}
+                               </li>
+                             );
+                           })}
                        </ul>
 
                         <button 
                           onClick={() => handlePlanSelect(plan.name)}
-                          disabled={loading || usage?.user?.plan === plan.name.toUpperCase() || user?.role === 'superadmin'}
+                          disabled={loading || usage?.user?.plan === plan.name.toUpperCase() || user?.role === 'superadmin' || usage?.user?.requested_plan === plan.name.toUpperCase()}
                           className={`w-full py-4 rounded-2xl text-[10px] font-bold transition-all uppercase tracking-[0.2em] shadow-md ${
                             usage?.user?.plan === plan.name.toUpperCase() 
                               ? 'bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100' 
-                              : user?.role === 'superadmin'
-                                ? 'bg-zinc-100 text-zinc-400 cursor-default'
-                                : plan.name === 'Professional' 
-                                  ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
-                                  : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
+                              : usage?.user?.requested_plan === plan.name.toUpperCase()
+                                ? 'bg-amber-50 text-amber-600 border border-amber-100 animate-pulse'
+                                : user?.role === 'superadmin'
+                                  ? 'bg-zinc-100 text-zinc-400 cursor-default'
+                                  : plan.name === 'Professional' 
+                                    ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
+                                    : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
                           }`}
                         >
-                           {user?.role === 'superadmin' ? 'Modo Administración' : usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : loading ? 'Procesando...' : 'Obtener Acceso'}
+                           {user?.role === 'superadmin' ? 'Modo Administración' : usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : usage?.user?.requested_plan === plan.name.toUpperCase() ? 'Aprobación Pendiente' : loading ? 'Procesando...' : 'Obtener Acceso'}
                         </button>
                     </div>
                   ))}

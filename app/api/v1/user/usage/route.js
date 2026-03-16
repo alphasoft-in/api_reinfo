@@ -37,7 +37,9 @@ export async function GET(request) {
                 quota_used: user.quota_used,
                 subscription_end: user.subscription_end,
                 active: user.active,
-                two_factor_enabled: user.two_factor_enabled
+                two_factor_enabled: user.two_factor_enabled,
+                payment_status: user.payment_status,
+                requested_plan: user.requested_plan
             },
             analytics: user.role === 'superadmin' ? {
                 topRucs
