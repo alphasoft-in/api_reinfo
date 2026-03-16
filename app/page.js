@@ -712,7 +712,7 @@ export default function Home() {
                              <p className="text-red-600 dark:text-red-400 text-sm font-light italic">{adminError}</p>
                              <button 
                                onClick={fetchAdminUsers}
-                               className="px-4 py-2 bg-zinc-900 text-white text-[10px] font-bold rounded-xl uppercase tracking-widest mt-4"
+                               className="px-4 py-2 bg-zinc-900 text-white text-[10px] font-light rounded-xl uppercase tracking-widest mt-4"
                              >
                                Reintentar Conexión
                              </button>
@@ -733,7 +733,7 @@ export default function Home() {
                           <p className="text-[10px] text-zinc-400 font-mono italic">Acceso Verificado</p>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${u.plan === 'ENTERPRISE' ? 'bg-zinc-800 text-zinc-100' : u.plan === 'PROFESSIONAL' ? 'bg-blue-100 text-blue-700' : 'bg-zinc-100 text-zinc-600'}`}>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-light uppercase ${u.plan === 'ENTERPRISE' ? 'bg-zinc-800 text-zinc-100' : u.plan === 'PROFESSIONAL' ? 'bg-blue-100 text-blue-700' : 'bg-zinc-100 text-zinc-600'}`}>
                             {u.plan}
                           </span>
                         </td>
@@ -747,7 +747,7 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4">
                            <div className="flex flex-col gap-1">
-                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black w-fit ${u.payment_status === 'active' ? 'bg-blue-100 text-blue-700' : u.payment_status === 'pending_approval' ? 'bg-amber-100 text-amber-700 animate-pulse' : 'bg-orange-100 text-orange-700'}`}>
+                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-light w-fit ${u.payment_status === 'active' ? 'bg-blue-50 text-blue-600' : u.payment_status === 'pending_approval' ? 'bg-amber-50 text-amber-700 animate-pulse' : 'bg-orange-50 text-orange-700'}`}>
                                 {u.payment_status === 'active' ? 'PAGO VERIFICADO' : u.payment_status === 'pending_approval' ? 'PENDIENTE APROBACIÓN' : 'PAGO PENDIENTE'}
                              </span>
                              {u.requested_plan && (
@@ -771,7 +771,7 @@ export default function Home() {
                                   quota_limit: u.quota_limit,
                                   requested_plan: u.requested_plan
                                 })}
-                                className={`h-9 px-4 rounded-xl text-[10px] font-medium transition-all ${u.payment_status === 'active' ? 'bg-zinc-100/50 text-zinc-400 hover:text-red-500' : u.payment_status === 'pending_approval' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20' : 'bg-zinc-900 text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900'}`}
+                                className={`h-9 px-4 rounded-xl text-[10px] font-light transition-all ${u.payment_status === 'active' ? 'bg-zinc-100/50 text-zinc-400 hover:text-red-500' : u.payment_status === 'pending_approval' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20' : 'bg-zinc-900 text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900'}`}
                               >
                                 {u.payment_status === 'active' ? 'ANULAR PAGO' : u.payment_status === 'pending_approval' ? 'APROBAR Y ACTIVAR' : 'APROBAR PAGO'}
                               </button>
@@ -1209,12 +1209,12 @@ export default function Home() {
                          </div>
                        )}
                        {plan.name === 'Professional' && plan.name.toUpperCase() !== usage?.user?.plan && (
-                         <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-bold px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-zinc-900/10">
+                         <div className="absolute top-6 right-8 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[8px] font-medium px-3 py-1 rounded-full uppercase tracking-[0.2em] shadow-lg shadow-zinc-900/10">
                            Recomendado
                          </div>
                        )}
                        
-                       <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-3">{plan.name}</h4>
+                       <h4 className="text-[10px] font-light text-zinc-400 uppercase tracking-[0.2em] mb-3">{plan.name}</h4>
                        
                        {editingPlan === plan.id && user?.role === 'superadmin' ? (
                          <div className="space-y-4 mb-8">
@@ -1238,7 +1238,7 @@ export default function Home() {
                            </div>
                            <button 
                              onClick={() => setEditingPlan(null)}
-                             className="text-[10px] text-blue-600 font-bold uppercase tracking-widest"
+                             className="text-[10px] text-blue-600 font-light uppercase tracking-widest"
                            >
                              Cerrar Edición
                            </button>
@@ -1284,7 +1284,7 @@ export default function Home() {
                         <button 
                           onClick={() => handlePlanSelect(plan.name)}
                           disabled={loading || usage?.user?.plan === plan.name.toUpperCase() || user?.role === 'superadmin' || usage?.user?.requested_plan === plan.name.toUpperCase()}
-                          className={`w-full py-4 rounded-2xl text-[10px] font-bold transition-all uppercase tracking-[0.2em] shadow-md ${
+                          className={`w-full py-4 rounded-2xl text-[10px] font-light transition-all uppercase tracking-[0.2em] shadow-md ${
                             usage?.user?.plan === plan.name.toUpperCase() 
                               ? 'bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100' 
                               : usage?.user?.requested_plan === plan.name.toUpperCase()
