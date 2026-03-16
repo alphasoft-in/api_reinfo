@@ -98,6 +98,7 @@ export default function Home() {
       fetchStats();
       fetchUsage();
       fetchSubHistory();
+      fetchNotifications();
       
       // Load data and config
       if (user?.role === 'superadmin') {
@@ -117,6 +118,15 @@ export default function Home() {
       }
     }
   }, [isLoggedIn, page, activeTab, hasSearched, user?.role]);
+
+  // Polling for notifications
+  useEffect(() => {
+    let interval;
+    if (isLoggedIn) {
+      interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+    }
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
 
   const fetchAdminUsers = async () => {
     try {
@@ -606,7 +616,7 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col min-w-0 bg-[#f8fafc] dark:bg-zinc-950">
         {/* Header Console */}
-        <header className="h-16 flex items-center justify-between px-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
+        <header className="h-16 flex items-center justify-between px-4 md:px-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
           <div className="flex-1 max-w-xl">
             <form 
               onSubmit={handleSearch} 
@@ -654,7 +664,7 @@ export default function Home() {
                 }}
                 className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all relative ${showNotifications ? 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm' : 'hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
               >
-                <Bell className="w-4.5 h-4.5" />
+                <Bell className="w-5 h-5" />
                 {notifications.some(n => !n.is_read) && (
                   <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-zinc-950 animate-pulse" />
                 )}
