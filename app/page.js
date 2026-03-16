@@ -19,6 +19,7 @@ import {
   Activity,
   UserCircle2,
   Filter,
+  User,
   Zap,
   Users,
   AlertCircle,
