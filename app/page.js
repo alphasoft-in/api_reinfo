@@ -40,6 +40,7 @@ export default function Home() {
   const [stats, setStats] = useState({ total: 0, vigentes: 0, suspendidos: 0 });
   const [usage, setUsage] = useState(null);
   const [adminUsers, setAdminUsers] = useState([]);
+  const [adminError, setAdminError] = useState("");
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -107,9 +108,27 @@ export default function Home() {
 
   const fetchAdminUsers = async () => {
     try {
+      setAdminError("");
+      console.log('Initiating Admin Users Fetch...');
       const res = await axios.get("/api/v1/admin/users");
-      if (res.data.success) setAdminUsers(res.data.users);
-    } catch (err) { console.error(err); }
+      console.log('Admin Users Response:', res.status, res.data);
+      if (res.data.success) {
+        if (res.data.users) {
+          setAdminUsers(res.data.users);
+          if (res.data.users.length === 0) {
+            setAdminError("La consulta fue exitosa pero no se encontró ningún cliente en la base de datos.");
+          }
+        } else {
+          setAdminError("Error: La respuesta no contiene la lista de usuarios.");
+        }
+      } else {
+        setAdminError(res.data.message || "Error desconocido al recuperar clientes.");
+      }
+    } catch (err) { 
+      const msg = err.response?.data?.message || err.message;
+      setAdminError("Error de Conexión/Permisos: " + msg);
+      console.error('Network/Auth Error in Admin Fetch:', err.response?.status, err.message);
+    }
   };
 
   const fetchUsage = async () => {
@@ -670,7 +689,29 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 font-light">
-                    {adminUsers.map(u => (
+                    {adminError ? (
+                      <tr>
+                        <td colSpan="6" className="py-20 text-center">
+                          <div className="max-w-md mx-auto space-y-3">
+                             <ShieldAlert className="w-10 h-10 text-red-400 mx-auto mb-4 opacity-50" />
+                             <p className="text-red-600 dark:text-red-400 text-sm font-light italic">{adminError}</p>
+                             <button 
+                               onClick={fetchAdminUsers}
+                               className="px-4 py-2 bg-zinc-900 text-white text-[10px] font-bold rounded-xl uppercase tracking-widest mt-4"
+                             >
+                               Reintentar Conexión
+                             </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : adminUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="py-20 text-center">
+                          <RefreshCw className="w-10 h-10 animate-spin mx-auto mb-4 opacity-10" />
+                          <p className="text-zinc-400 text-sm font-light uppercase tracking-widest">Sincronizando Usuarios...</p>
+                        </td>
+                      </tr>
+                    ) : adminUsers.map(u => (
                       <tr key={u.id} className="hover:bg-zinc-50/30 dark:hover:bg-zinc-800/30 transition-colors">
                         <td className="px-6 py-4">
                           <p className="text-sm font-light text-zinc-900 dark:text-zinc-100">{u.email || u.username}</p>
