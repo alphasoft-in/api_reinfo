@@ -1130,7 +1130,10 @@ export default function Home() {
                      <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
                      <div className="flex items-baseline gap-1.5">
                         <p className={`text-2xl font-light tracking-normal ${stat.color}`}>{(stat.value || 0).toLocaleString()}</p>
-                        <span className="text-[9px] font-light text-zinc-300 uppercase t                   <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
+                        <span className="text-[9px] font-light text-zinc-300 uppercase tracking-normaler">Nodos</span>
+                     </div>
+                   </div>
+                  <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
                     <stat.icon className="w-5 h-5 opacity-80" />
                   </div>
                 </div>
@@ -1156,11 +1159,7 @@ export default function Home() {
                 </div>
               ))
             )}
--80" />
-                  </div>
-                </div>
-              ))
-            )}
+          </div>
           </div>
 
           {/* Master Table - Hidden for regular users until they search */}
