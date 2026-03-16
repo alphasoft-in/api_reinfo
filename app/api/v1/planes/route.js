@@ -21,7 +21,8 @@ export async function GET() {
 
 export async function PUT(req) {
     try {
-        const token = cookies().get('auth_token')?.value;
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth_token')?.value;
         const decoded = await verifyToken(token);
 
         if (!decoded || decoded.role !== 'superadmin') {
