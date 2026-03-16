@@ -1134,16 +1134,11 @@ export default function Home() {
                      </div>
                    </div>
                   <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
-                    <stat.icon className="w-5 h-5 opacity-80" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              // Case 2: Client (Personal Consumption Only)
+                    <stat.icon className="w-5 h-5 opacity-80" /              // Case 2: Client (Personal Consumption Only)
               [
-                { label: "Consultas Realizadas", value: usage?.quota_used || 0, color: "text-zinc-900 dark:text-white", icon: RefreshCw, unit: "Búsquedas" },
-                { label: "Créditos Disponibles", value: Math.max(0, (usage?.quota_limit || 0) - (usage?.quota_used || 0)), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
-                { label: "Créditos del Plan", value: usage?.quota_limit || usage?.plan || "FREE", color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage?.plan || "Nivel" },
+                { label: "Consultas Realizadas", value: usage?.user?.quota_used || usage?.quota_used || 0, color: "text-zinc-900 dark:text-white", icon: RefreshCw, unit: "Búsquedas" },
+                { label: "Créditos Disponibles", value: Math.max(0, (usage?.user?.quota_limit || usage?.quota_limit || 0) - (usage?.user?.quota_used || usage?.quota_used || 0)), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
+                { label: "Créditos del Plan", value: usage?.user?.quota_limit || usage?.quota_limit || user?.plan || "FREE", color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage?.user?.plan || usage?.plan || "Nivel" },
               ].map((stat, i) => (
                 <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
                   <div>
@@ -1151,6 +1146,9 @@ export default function Home() {
                      <div className="flex items-baseline gap-1.5">
                         <p className={`text-2xl font-light tracking-normal ${stat.color}`}>{(stat.value || 0).toLocaleString()}</p>
                         <span className="text-[9px] font-light text-zinc-300 uppercase tracking-normaler">{stat.unit}</span>
+                     </div>
+                  </div>
+king-normaler">{stat.unit}</span>
                      </div>
                    </div>
                   <div className={`w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center ${stat.color}`}>
