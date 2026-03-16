@@ -432,7 +432,7 @@ export default function Home() {
     <div className="flex h-screen bg-[#fcfdfe] dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 overflow-hidden font-sans selection:bg-zinc-900 selection:text-white">
       {/* Sidebar Interface */}
       <aside className="w-64 border-r border-zinc-200 dark:border-zinc-800 hidden lg:flex flex-col shrink-0 bg-white dark:bg-zinc-950">
-        <div className="h-20 flex items-center px-8 shrink-0">
+        <div className="h-16 flex items-center px-8 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
               <Activity className="w-5 h-5 text-white dark:text-zinc-900" />
@@ -515,7 +515,7 @@ export default function Home() {
 
       <main className="flex-1 flex flex-col min-w-0 bg-[#f8fafc] dark:bg-zinc-950">
         {/* Header Console */}
-        <header className="h-20 flex items-center justify-between px-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
+        <header className="h-16 flex items-center justify-between px-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40 shrink-0">
           <div className="flex-1 max-w-xl">
             <form 
               onSubmit={handleSearch} 
@@ -529,7 +529,7 @@ export default function Home() {
                 value={query} 
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Filtrar por RUC o Titular..."
-                className="flex-1 bg-transparent border-none py-3.5 text-sm focus:ring-0 outline-none placeholder:text-zinc-400"
+                className="flex-1 bg-transparent border-none py-2 text-sm focus:ring-0 outline-none placeholder:text-zinc-400"
               />
               <div className="flex items-center self-stretch">
                 <button 
@@ -610,7 +610,7 @@ export default function Home() {
         </header>
 
         {/* Dynamic Viewport */}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8 custom-scrollbar">
           {!usage?.user?.two_factor_enabled && !user?.two_factor_enabled && (
             <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-700">
                <div className="flex items-center gap-4">
