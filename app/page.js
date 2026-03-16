@@ -901,6 +901,14 @@ export default function Home() {
                               <div className="relative">
                                 <select 
                                   name="plan" defaultValue={editingUser.plan}
+                                  onChange={(e) => {
+                                    const plan = e.target.value;
+                                    const input = document.getElementById('modal-quota-input');
+                                    if (input) {
+                                      const defaultQuotas = { 'FREE': 5, 'PROFESSIONAL': 5000, 'ENTERPRISE': 20000, 'PLATFORM': 1000000 };
+                                      input.value = defaultQuotas[plan] || 5;
+                                    }
+                                  }}
                                   className="appearance-none w-full h-11 pl-4 pr-10 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all cursor-pointer"
                                 >
                                   <option value="FREE">FREE</option>
@@ -912,8 +920,9 @@ export default function Home() {
                               </div>
                             </div>
                             <div className="space-y-2">
-                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Cupo de Consultas</label>
+                              <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Consultas</label>
                               <input 
+                                id="modal-quota-input"
                                 name="quota" type="number" defaultValue={editingUser.quota_limit} required 
                                 className="w-full h-11 px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-light focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all"
                               />
