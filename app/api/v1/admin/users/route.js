@@ -20,12 +20,19 @@ const validateAdmin = async (request) => {
     const decoded = verifyToken(token);
     if (!decoded) return { error: 'Token inválido o expirado' };
     
-    if (decoded.role === 'superadmin') return { user: decoded };
+    if (decoded.role === 'superadmin') {
+        console.log('Admin validated via JWT:', decoded.username);
+        return { user: decoded };
+    }
 
     // Fallback: Check DB in case role changed but JWT is old
     const user = await getUserByUsername(decoded.username);
-    if (user && user.role === 'superadmin') return { user };
+    if (user && user.role === 'superadmin') {
+        console.log('Admin validated via DB fallback:', user.username);
+        return { user };
+    }
 
+    console.warn('Admin validation failed for:', decoded.username, 'Role:', decoded.role);
     return { error: 'Permisos de super-administrador requeridos' };
 };
 
@@ -37,8 +44,10 @@ export async function GET(request) {
 
     try {
         const users = await getAllUsers();
+        console.log('Admin API: Fetched', users.length, 'users');
         return NextResponse.json({ success: true, users });
     } catch (error) {
+        console.error('Admin API ERROR:', error);
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
     }
 }

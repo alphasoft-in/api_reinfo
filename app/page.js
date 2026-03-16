@@ -88,7 +88,10 @@ export default function Home() {
       
       // Load data and config
       if (user?.role === 'superadmin') {
-        if (activeTab === 'admin' || activeTab === 'dashboard') fetchAdminUsers();
+        if (activeTab === 'admin' || activeTab === 'dashboard') {
+          console.log('Tab change/Effect: fetching admin users');
+          fetchAdminUsers();
+        }
         fetchPlanes();
         if (activeTab === 'dashboard') fetchData();
       } else {
@@ -639,9 +642,18 @@ export default function Home() {
                   <h2 className="text-2xl font-light tracking-normal">Administración de Clientes</h2>
                   <p className="text-sm text-zinc-400 font-light mt-1">Gestión centralizada de suscripciones, cuotas y acceso de empresas.</p>
                 </div>
-                <div className="bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                  <span className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mr-2">Total Clientes:</span>
-                  <span className="text-sm font-light">{adminUsers.length}</span>
+                <div className="flex items-center gap-3">
+                  <div className="bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
+                    <span className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mr-2">Total Clientes:</span>
+                    <span className="text-sm font-light">{adminUsers.length}</span>
+                  </div>
+                  <button 
+                    onClick={fetchAdminUsers}
+                    className="p-2 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-xl transition-all border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                    title="Refrescar Lista"
+                  >
+                    <RefreshCw className={`w-4 h-4 text-zinc-400 ${loading && 'animate-spin'}`} />
+                  </button>
                 </div>
               </div>
 
@@ -1151,7 +1163,10 @@ export default function Home() {
               <button 
                 onClick={() => {
                   fetchUsage();
-                  if (user?.role === 'superadmin') fetchStats();
+                  if (user?.role === 'superadmin') {
+                    fetchStats();
+                    fetchAdminUsers();
+                  }
                   if (query || hasSearched) fetchData();
                 }} 
                 className="inline-flex items-center h-10 px-5 text-sm font-light bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm"
