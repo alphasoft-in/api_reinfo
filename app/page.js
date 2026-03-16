@@ -610,7 +610,7 @@ export default function Home() {
         </header>
 
         {/* Dynamic Viewport */}
-        <div className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 custom-scrollbar">
           {!usage?.user?.two_factor_enabled && !user?.two_factor_enabled && (
             <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-700">
                <div className="flex items-center gap-4">
@@ -1136,12 +1136,12 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-light tracking-normal">
-                {user?.role === 'superadmin' ? 'Panel de Control de Sistema' : 'Mi Consumo REINFO'}
+              <h1 className="text-xl font-light tracking-normal">
+                {user?.role === 'superadmin' ? 'Monitor Global Sistema' : 'Mi Consumo REINFO'}
               </h1>
-              <p className="text-sm text-zinc-400 font-light mt-1">
+              <p className="text-xs text-zinc-400 font-light mt-0.5">
                 {user?.role === 'superadmin' 
-                  ? 'Gestión integral de la base de datos nacional REINFO.' 
+                  ? 'Visión consolidada de la red nacional REINFO.' 
                   : 'Monitoreo de créditos y consultas corporativas.'}
               </p>
             </div>
@@ -1169,7 +1169,7 @@ export default function Home() {
                 { label: "Vigentes Activos", value: stats.vigentes, color: "text-blue-600 dark:text-blue-400", icon: CheckCircle2 },
                 { label: "En Suspensión", value: stats.suspendidos, color: "text-red-600 dark:text-red-400", icon: AlertCircle },
               ].map((stat, i) => (
-                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
+                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
                   <div>
                      <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
                      <div className="flex items-baseline gap-1.5">
@@ -1189,7 +1189,7 @@ export default function Home() {
                 { label: "Créditos Disponibles", value: Math.max(0, (usage?.user?.quota_limit || usage?.quota_limit || 0) - (usage?.user?.quota_used || usage?.quota_used || 0)), color: "text-blue-600 dark:text-blue-400", icon: Zap, unit: "Saldo" },
                 { label: "Créditos del Plan", value: usage?.user?.quota_limit || usage?.quota_limit || user?.plan || "FREE", color: "text-zinc-500 dark:text-zinc-400", icon: ShieldCheck, unit: usage?.user?.plan || usage?.plan || "Nivel" },
               ].map((stat, i) => (
-                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
+                <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
                   <div>
                      <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-1.5">{stat.label}</p>
                      <div className="flex items-baseline gap-1.5">
@@ -1208,7 +1208,7 @@ export default function Home() {
           {/* Master Table - Hidden for regular users until they search */}
           {(user?.role === 'superadmin' || hasSearched) && (
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40">
+              <div className="px-6 py-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/40">
                 <div className="flex items-center gap-2">
                   <Filter className="w-4 h-4 text-zinc-400" />
                   <h2 className="text-sm font-light tracking-normal text-zinc-600 dark:text-zinc-300 uppercase">Listado de Operadores</h2>
@@ -1237,7 +1237,7 @@ export default function Home() {
                       </tr>
                     ) : data.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="py-32 text-center">
+                        <td colSpan="5" className="py-12 text-center">
                           <div className="max-w-sm mx-auto space-y-4">
                             <div className="w-16 h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
                               <Search className="w-8 h-8 text-zinc-300" />
