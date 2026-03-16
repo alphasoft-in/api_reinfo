@@ -1808,14 +1808,15 @@ export default function Home() {
                   reference: e.target.reference.value
                 });
               }} className="space-y-6">
-                 <div className="space-y-2">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1">Monto Transferido (USD)</label>
                     <input 
                       name="amount" type="text" required 
+                      defaultValue={plansConfig.find(p => p.name.toUpperCase() === pendingUpgradePlan?.toUpperCase())?.price || ''}
                       placeholder="Ej: 49.00"
                       className="w-full h-12 px-5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-lg font-light focus:outline-none focus:border-blue-500 transition-all font-mono"
                     />
-                 </div>
+                  </div>
 
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
