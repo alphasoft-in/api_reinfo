@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { getUserByUsername, getUserSubscriptions } from '@/lib/db';
+import { getUserByUsername, getUserSubscriptions, initDb } from '@/lib/db';
 
 export async function GET() {
     try {
+        await initDb();
         const cookieStore = await cookies();
         const token = cookieStore.get('reinfo_session')?.value;
 
