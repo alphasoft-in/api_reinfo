@@ -1,6 +1,6 @@
 # REINFO Pro API Documentation v1
 
-Bienvenido a la documentación técnica de la API de REINFO Pro. Esta guía detalla todos los endpoints disponibles para la integración con sistemas corporativos.
+Bienvenido a la documentación técnica de la API de REINFO Pro. Esta guía detalla todos los endpoints disponibles para la integración con sistemas corporativos, incluyendo estructuras de respuesta y ejemplos detallados.
 
 ---
 
@@ -11,125 +11,110 @@ La API soporta dos métodos de autenticación:
 2.  **API Key**: Utilizado para integraciones externas.
     *   Header: `x-api-key: TU_LLAVE_SECRETA`
 
-### 1. Iniciar Sesión
-`POST /api/v1/auth/login`
-
-**Body:**
-```json
-{
-  "email": "usuario@empresa.com",
-  "password": "tu_contraseña"
-}
-```
-
-**Respuesta:**
-*   `200 OK`: Devuelve los datos del usuario y establece una cookie HttpOnly.
-*   `mfaRequired`: Si está activo, devuelve `mfaRequired: true` y un `mfaToken`.
-
 ---
 
-### 2. Registro de Empresa
-`POST /api/v1/auth/register`
-
-**Body:**
-```json
-{
-  "email": "admin@empresa.com",
-  "password": "contraseña_segura",
-  "plan": "FREE | PROFESSIONAL | ENTERPRISE"
-}
-```
-
----
-
-### 3. Verificar 2FA (MFA)
-`POST /api/v1/auth/2fa/verify`
-
-**Headers:** Requiere cookie de sesión.
-**Body:** `{"code": "123456"}`
-
----
-
-## 🔍 Consultas Principal
+## 🔍 Consultas de Registros
 
 ### Consulta de Registros REINFO
 `GET /api/v1/registros`
 
-**Headers:** `x-api-key` o sesión activa.
-
 **Parámetros URL:**
-*   `ruc` (opcional): Filtro por número de RUC exacto.
-*   `name` (opcional): Búsqueda parcial por nombre de minero.
-*   `codigoUnico` (opcional): Filtro por código único de concesión.
-*   `status` (opcional): `vigente` | `suspendido`.
-*   `limit` (opcional): Cantidad de resultados (default 25).
-*   `offset` (opcional): Paginación.
+*   `ruc`: Filtro por RUC exacto (11 dígitos).
+*   `name`: Búsqueda parcial por nombre del minero.
+*   `codigoUnico`: Filtro por código de concesión.
+*   `status`: `vigente` | `suspendido`.
+*   `limit`: Resultados por página (default 25).
+*   `offset`: Paginación (default 0).
 
-**Respuesta:**
+**Estructura de Respuesta (Success):**
 ```json
 {
   "success": true,
-  "count": 25,
-  "totalCount": 540000,
-  "filteredCount": 100,
-  "data": [...]
+  "count": 1,
+  "totalCount": 540230,
+  "filteredCount": 1,
+  "data": [
+    {
+      "numero": 1234,
+      "ruc": "20100100101",
+      "minero": "MINERA DEL SUR S.A.C.",
+      "codigoUnico": "010000115",
+      "nombreDerecho": "SAN PEDRO 1",
+      "departamento": "AREQUIPA",
+      "provincia": "CARAVELI",
+      "distrito": "CHALA",
+      "estado": "VIGENTE"
+    }
+  ]
 }
 ```
 
+**Descripción de Campos:**
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `numero` | Integer | ID correlativo del registro. |
+| `ruc` | String | Registro Único de Contribuyente. |
+| `minero` | String | Nombre o Razón Social del operador. |
+| `codigoUnico` | String | Código de la concesión minera. |
+| `estado` | String | Estado actual (`VIGENTE`, `SUSPENDIDO`). |
+
 ---
 
-## 👤 Gestión de Usuario
+## 👤 Perfil y Uso
 
-### Obtener Perfil y Uso
+### Obtener Uso de Cuota
 `GET /api/v1/user/usage`
 
-Devuelve el estado actual de la cuenta, plan activo, cuota utilizada (`quota_used`) y límite total (`quota_limit`).
-
-### Solicitar Cambio de Plan
-`POST /api/v1/user/upgrade`
-
-**Body:** `{"plan": "PROFESSIONAL | ENTERPRISE"}`
-Crea una solicitud que debe ser aprobada por un administrador.
-
-### Regenerar API Key
-`POST /api/v1/user/reset-key`
-
-Invalida la llave anterior y genera una nueva llave secreta para integraciones.
-
----
-
-## 🛠 Administración (Superadmin Only)
-
-### Listado de Usuarios
-`GET /api/v1/admin/users`
-
-### Actualizar Usuario (Aprobación de Pagos)
-`POST /api/v1/admin/users`
-
-**Body:**
+**Respuesta Exitosa:**
 ```json
 {
-  "userId": 1,
-  "payment_status": "active | pending",
-  "plan": "FREE | PROFESSIONAL | ENTERPRISE",
-  "active": true/false
+  "success": true,
+  "user": {
+    "username": "admin@empresa.com",
+    "plan": "PROFESSIONAL",
+    "quota_limit": 5000,
+    "quota_used": 1240,
+    "subscription_end": "2026-04-15T10:00:00Z",
+    "active": true,
+    "two_factor_enabled": true
+  }
 }
 ```
 
-### Estadísticas Globales
-`GET /api/v1/stats`
+---
 
-### Configuración de Planes
-`GET /api/v1/planes` (Listar planes y sus límites configurados)
+## ⚠️ Manejo de Errores
+
+Todas las respuestas de error siguen este formato:
+```json
+{
+  "success": false,
+  "message": "Descripción legible del error"
+}
+```
+
+### Códigos de Estado Comunes
+*   **401 Unauthorized**: API Key inválida o inexistente.
+*   **403 Forbidden**: Cuota agotada o suscripción vencida.
+*   **429 Too Many Requests**: Límite de tasa excedido.
+*   **500 Internal Server Error**: Error inesperado en el servidor.
 
 ---
 
-## ⚠️ Códigos de Error
+## 🛠 Ejemplo de Implementación (Node.js)
 
-| Código | Significado | Causa Común |
-| :--- | :--- | :--- |
-| **400** | Bad Request | Parámetros faltantes o mal formateados. |
-| **401** | Unauthorized | API Key inválida o sesión expirada. |
-| **403** | Forbidden | Cuenta suspendida, cuota agotada o suscripción vencida. |
-| **429** | Too Many Requests | Límite de tasa alcanzado o cuenta bloqueada por intentos fallidos. |
-| **500** | Server Error | Error inesperado en el sistema. |
+```javascript
+const axios = require('axios');
+
+async function checkRUC(ruc) {
+  try {
+    const res = await axios.get('https://api-reinfo.com/api/v1/registros', {
+      params: { ruc },
+      headers: { 'x-api-key': 'tu_llave_secreta' }
+    });
+    console.log('Estado:', res.data.data[0].estado);
+  } catch (err) {
+    console.error('Error:', err.response.data.message);
+  }
+}
+```

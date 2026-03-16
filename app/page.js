@@ -1175,6 +1175,24 @@ export default function Home() {
                                 </div>
                               ))}
                            </div>
+
+                           <div className="mt-6 space-y-3">
+                              <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-light">Estructura de Respuesta</p>
+                              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 font-mono text-[11px] text-blue-400/80 leading-relaxed shadow-inner">
+                                 <div className="flex justify-between items-center mb-2 text-[9px] text-zinc-600 uppercase">
+                                    <span>JSON Response</span>
+                                    <span>200 OK</span>
+                                 </div>
+                                 <p className="text-zinc-500">{'{'}</p>
+                                 <p className="pl-4">"success": <span className="text-zinc-100">true</span>,</p>
+                                 <p className="pl-4">"data": [{'{'}</p>
+                                 <p className="pl-8 text-zinc-300">"ruc": "2010...",</p>
+                                 <p className="pl-8 text-zinc-300">"minero": "...",</p>
+                                 <p className="pl-8 text-zinc-300">"estado": "VIGENTE"</p>
+                                 <p className="pl-4">{'}'}]</p>
+                                 <p className="text-zinc-500">{'}'}</p>
+                              </div>
+                           </div>
                         </div>
                     </div>
                   </div>
