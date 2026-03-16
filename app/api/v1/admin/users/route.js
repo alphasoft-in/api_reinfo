@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser } from '@/lib/db';
+import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser, getPlanes } from '@/lib/db';
 
 const validateAdmin = async (request) => {
     const authHeader = request.headers.get('authorization');

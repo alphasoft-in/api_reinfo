@@ -303,8 +303,15 @@ export default function Home() {
   const handleUpdateUser = async (userId, updates) => {
     try {
       const res = await axios.post("/api/v1/admin/users", { userId, ...updates });
-      if (res.data.success) fetchAdminUsers();
-    } catch (err) { console.error(err); }
+      if (res.data.success) {
+        fetchAdminUsers();
+      } else {
+        alert("Error: " + res.data.message);
+      }
+    } catch (err) { 
+      console.error(err); 
+      alert("Error de conexión al actualizar usuario");
+    }
   };
 
   const handleDeleteUser = async (userId) => {
@@ -313,8 +320,13 @@ export default function Home() {
       if (res.data.success) {
         fetchAdminUsers();
         setShowDeleteConfirm(null);
+      } else {
+        alert("Error: " + res.data.message);
       }
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+      alert("Error de conexión al eliminar usuario");
+    }
   };
 
   const handleLogout = async () => {
