@@ -48,6 +48,8 @@ export default function Home() {
   const [mfaToken, setMfaToken] = useState("");
   const [twoFactorSetup, setTwoFactorSetup] = useState(null);
   const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [plansConfig, setPlansConfig] = useState([]);
+  const [editingPlan, setEditingPlan] = useState(null);
 
   useEffect(() => {
     checkSession();
@@ -81,11 +83,15 @@ export default function Home() {
       if (user?.role === 'superadmin') {
         fetchAdminUsers();
         fetchData(); // Admins load data automatically
-      } else if (query || hasSearched) {
-        // Regular users only load if searching/requested
-        fetchData();
+        fetchPlanes();
       } else {
-        setData([]); 
+        fetchPlanes();
+        if (query || hasSearched) {
+          // Regular users only load if searching/requested
+          fetchData();
+        } else {
+          setData([]); 
+        }
       }
     }
   }, [isLoggedIn, page, activeTab, hasSearched]);
@@ -115,6 +121,23 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const fetchPlanes = async () => {
+    try {
+      const res = await axios.get("/api/v1/planes");
+      if (res.data.success) setPlansConfig(res.data.planes);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleUpdatePlanConfig = async (id, updates) => {
+    try {
+      const res = await axios.put("/api/v1/planes", { id, ...updates });
+      if (res.data.success) {
+        fetchPlanes();
+        setEditingPlan(null);
+      }
+    } catch (err) { console.error(err); }
   };
 
   const fetchData = async (searchQuery = query) => {
@@ -355,7 +378,7 @@ export default function Home() {
                 </div>
               )}
               {loginError && (
-                <div className={`p-3 border rounded-lg ${loginError.includes('exitoso') ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                <div className={`p-3 border rounded-lg ${loginError.includes('exitoso') ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
                   <p className="text-xs font-light text-center">{loginError}</p>
                 </div>
               )}
@@ -409,6 +432,7 @@ export default function Home() {
               ...(user?.role === 'superadmin' ? [
                 { id: "vigentes", icon: CheckCircle2, label: "Registros Vigentes" },
                 { id: "suspendidos", icon: PauseCircle, label: "En Suspensión" },
+                { id: "planes", icon: Zap, label: "Gestión de Planes" },
               ] : [
                 { id: "planes", icon: Zap, label: "Planes y Precios" },
               ]),
@@ -612,7 +636,7 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4">
                            <div className="flex flex-col gap-1">
-                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black w-fit ${u.payment_status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
+                             <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black w-fit ${u.payment_status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                                 {u.payment_status === 'active' ? 'PAGO VERIFICADO' : 'PAGO PENDIENTE'}
                              </span>
                            </div>
@@ -652,7 +676,7 @@ export default function Home() {
                                   quota_limit: u.quota_limit,
                                   payment_status: u.payment_status
                                 })}
-                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.active ? 'hover:bg-red-50 hover:text-red-600 border-transparent' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-light transition-all border ${u.active ? 'hover:bg-red-50 hover:text-red-600 border-transparent' : 'bg-blue-50 text-blue-600 border-blue-100'}`}
                               >
                                 {u.active ? 'SUSPENDER' : 'ACTIVAR'}
                               </button>
@@ -721,12 +745,12 @@ export default function Home() {
                         </p>
                         
                         <div className="space-y-2">
-                           <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1 text-emerald-500">Master API Key</label>
+                           <label className="text-[10px] font-light text-zinc-400 uppercase tracking-widest ml-1 text-blue-500">Master API Key</label>
                            <div className="relative group">
                               <input 
                                 readOnly value={user?.apiKey || 'Cargando...'}
                                 type="password"
-                                className="w-full h-12 pl-4 pr-32 bg-zinc-950 text-emerald-400 font-mono text-xs rounded-xl border border-zinc-800 focus:ring-0 outline-none"
+                                className="w-full h-12 pl-4 pr-32 bg-zinc-950 text-blue-400 font-mono text-xs rounded-xl border border-zinc-800 focus:ring-0 outline-none"
                               />
                               <button 
                                 onClick={() => {
@@ -763,7 +787,7 @@ export default function Home() {
                            <AlertCircle className="w-5 h-5 text-blue-500" />
                            Seguridad: Autenticación en 2 Pasos
                         </h3>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${usage?.user?.two_factor_enabled ? 'bg-emerald-100 text-emerald-600' : 'bg-zinc-100 text-zinc-400'}`}>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${usage?.user?.two_factor_enabled ? 'bg-blue-100 text-blue-600' : 'bg-zinc-100 text-zinc-400'}`}>
                            {usage?.user?.two_factor_enabled ? 'Activado' : 'Desactivado'}
                         </span>
                      </div>
@@ -864,7 +888,7 @@ export default function Home() {
                      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm">
                         <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/30">
                            <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-emerald-500 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">GET</span>
+                              <span className="px-3 py-1 bg-blue-500 text-white text-[10px] font-black rounded-lg uppercase tracking-widest">GET</span>
                               <code className="text-sm font-light opacity-80">/api/v1/registros?ruc=12345678901</code>
                            </div>
                         </div>
@@ -879,7 +903,7 @@ export default function Home() {
                               </thead>
                               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 font-light">
                                  <tr>
-                                    <td className="px-6 py-4 text-sm font-light text-emerald-600">200 OK</td>
+                                    <td className="px-6 py-4 text-sm font-light text-blue-600">200 OK</td>
                                     <td className="px-6 py-4 text-xs text-zinc-500">Consulta exitosa. Devuelve los datos del minero.</td>
                                     <td className="px-6 py-4"><code className="text-[10px] bg-zinc-50 dark:bg-zinc-950 p-1 rounded font-light">{"{ success: true, data: [...] }"}</code></td>
                                  </tr>
@@ -908,10 +932,10 @@ export default function Home() {
                   <section className="space-y-4">
                      <h3 className="text-lg font-light px-2">Ejemplo de Integración (cURL)</h3>
                      <div className="bg-zinc-900 text-zinc-400 p-6 rounded-3xl font-mono text-[12px] leading-relaxed relative group overflow-hidden border border-zinc-800">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500 opacity-50" />
+                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-50" />
                         <span className="text-zinc-500"># Consultar por RUC</span><br/>
-                        curl -X GET <span className="text-emerald-400">"{process.env.NEXT_PUBLIC_API_URL}/registros?ruc=20100100101"</span> \<br/>
-                        &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">"x-api-key: TU_API_KEY_AQUI"</span>
+                         curl -X GET <span className="text-blue-400">"{process.env.NEXT_PUBLIC_API_URL}/registros?ruc=20100100101"</span> \<br/>
+                         &nbsp;&nbsp;&nbsp;&nbsp; -H <span className="text-blue-400">"x-api-key: TU_API_KEY_AQUI"</span>
                      </div>
                   </section>
                </div>
@@ -924,14 +948,14 @@ export default function Home() {
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {[
+                  {(plansConfig.length > 0 ? plansConfig : [
                     { name: 'Free', price: '0', limit: '5', features: ['5 Consultas Únicas', 'Acceso portal', 'Soporte email'] },
                     { name: 'Professional', price: '49', limit: '10,000', features: ['10k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
                     { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Consultas Ilimitadas*', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
-                  ].map((plan, i) => (
-                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none' : 'border-zinc-100 dark:border-zinc-800 shadow-sm'} rounded-[32px] p-10 flex flex-col relative transition-all duration-500 hover:scale-[1.02] ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-zinc-900 dark:ring-zinc-100 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
+                  ]).map((plan, i) => (
+                    <div key={i} className={`bg-white dark:bg-zinc-900 border ${plan.name === 'Professional' ? 'border-zinc-200 dark:border-zinc-700 shadow-xl shadow-zinc-200/50 dark:shadow-none' : 'border-zinc-100 dark:border-zinc-800 shadow-sm'} rounded-[32px] p-10 flex flex-col relative transition-all duration-500 hover:scale-[1.02] ${usage?.user?.plan === plan.name.toUpperCase() ? 'ring-2 ring-blue-600 dark:ring-blue-400 ring-offset-4 dark:ring-offset-zinc-950' : ''}`}>
                        {usage?.user?.plan === plan.name.toUpperCase() && (
-                         <div className="absolute -top-3 left-10 bg-emerald-500 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-emerald-500/20 animate-in fade-in zoom-in">
+                         <div className="absolute -top-3 left-10 bg-blue-600 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20 animate-in fade-in zoom-in">
                            Suscripción Activa
                          </div>
                        )}
@@ -942,17 +966,51 @@ export default function Home() {
                        )}
                        
                        <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-3">{plan.name}</h4>
-                       <div className="flex items-baseline gap-1 mb-8">
-                          <span className="text-4xl font-extralight tracking-tight text-zinc-900 dark:text-zinc-100">${plan.price}</span>
-                          <span className="text-[11px] text-zinc-400 font-light">/mes</span>
-                       </div>
+                       
+                       {editingPlan === plan.id && user?.role === 'superadmin' ? (
+                         <div className="space-y-4 mb-8">
+                           <div className="space-y-1">
+                             <label className="text-[9px] text-zinc-400 uppercase">Precio ($)</label>
+                             <input 
+                               type="text" 
+                               defaultValue={plan.price}
+                               onBlur={(e) => handleUpdatePlanConfig(plan.id, { ...plan, price: e.target.value })}
+                               className="w-full bg-zinc-50 dark:bg-zinc-800 border-none rounded-xl px-4 py-2 text-xl font-light focus:ring-1 focus:ring-blue-500"
+                             />
+                           </div>
+                           <div className="space-y-1">
+                             <label className="text-[9px] text-zinc-400 uppercase">Límite Consultas</label>
+                             <input 
+                               type="text" 
+                               defaultValue={plan.limit}
+                               onBlur={(e) => handleUpdatePlanConfig(plan.id, { ...plan, limit: e.target.value })}
+                               className="w-full bg-zinc-50 dark:bg-zinc-800 border-none rounded-xl px-4 py-2 text-sm font-light focus:ring-1 focus:ring-blue-500"
+                             />
+                           </div>
+                           <button 
+                             onClick={() => setEditingPlan(null)}
+                             className="text-[10px] text-blue-600 font-bold uppercase tracking-widest"
+                           >
+                             Cerrar Edición
+                           </button>
+                         </div>
+                       ) : (
+                         <div 
+                           className={`flex items-baseline gap-1 mb-8 ${user?.role === 'superadmin' ? 'cursor-pointer hover:opacity-70 transition-opacity' : ''}`}
+                           onClick={() => user?.role === 'superadmin' && setEditingPlan(plan.id)}
+                         >
+                            <span className="text-4xl font-extralight tracking-tight text-zinc-900 dark:text-zinc-100">${plan.price}</span>
+                            <span className="text-[11px] text-zinc-400 font-light">/mes</span>
+                            {user?.role === 'superadmin' && <Edit3 className="w-3 h-3 ml-2 text-zinc-300" />}
+                         </div>
+                       )}
 
                        <div className="h-[1px] bg-zinc-100 dark:bg-zinc-800 w-full mb-8" />
 
                        <ul className="space-y-4 mb-10 flex-1">
                           {plan.features.map((f, j) => (
                             <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-600 dark:text-zinc-400 font-light">
-                               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 opacity-80" />
+                               <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 opacity-80" />
                                {f}
                             </li>
                           ))}
@@ -960,16 +1018,18 @@ export default function Home() {
 
                         <button 
                           onClick={() => handlePlanSelect(plan.name)}
-                          disabled={loading || usage?.user?.plan === plan.name.toUpperCase()}
+                          disabled={loading || usage?.user?.plan === plan.name.toUpperCase() || user?.role === 'superadmin'}
                           className={`w-full py-4 rounded-2xl text-[10px] font-bold transition-all uppercase tracking-[0.2em] shadow-md ${
                             usage?.user?.plan === plan.name.toUpperCase() 
                               ? 'bg-zinc-50 text-zinc-300 cursor-not-allowed border border-zinc-100' 
-                              : plan.name === 'Professional' 
-                                ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
-                                : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
+                              : user?.role === 'superadmin'
+                                ? 'bg-zinc-100 text-zinc-400 cursor-default'
+                                : plan.name === 'Professional' 
+                                  ? 'bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 hover:shadow-xl hover:shadow-zinc-900/20 dark:hover:shadow-white/5 active:scale-95' 
+                                  : 'bg-white text-zinc-900 border border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-zinc-800 dark:text-zinc-100 dark:border-zinc-700 active:scale-95'
                           }`}
                         >
-                           {usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : loading ? 'Procesando...' : 'Obtener Acceso'}
+                           {user?.role === 'superadmin' ? 'Modo Administración' : usage?.user?.plan === plan.name.toUpperCase() ? 'Tu Plan Actual' : loading ? 'Procesando...' : 'Obtener Acceso'}
                         </button>
                     </div>
                   ))}
@@ -1027,7 +1087,7 @@ export default function Home() {
               // Case 1: Superadmin (Global Monitor)
               [
                 { label: "Total Registros", value: stats.total, color: "text-zinc-900 dark:text-white", icon: Users },
-                { label: "Vigentes Activos", value: stats.vigentes, color: "text-emerald-600 dark:text-emerald-400", icon: CheckCircle2 },
+                { label: "Vigentes Activos", value: stats.vigentes, color: "text-blue-600 dark:text-blue-400", icon: CheckCircle2 },
                 { label: "En Suspensión", value: stats.suspendidos, color: "text-red-600 dark:text-red-400", icon: AlertCircle },
               ].map((stat, i) => (
                 <div key={i} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl shadow-sm transition-card hover:shadow-md flex items-center justify-between">
@@ -1140,10 +1200,10 @@ export default function Home() {
                         <td className="px-6 py-4.5 text-center">
                           <span className={`inline-flex items-center px-4 py-1 rounded-lg text-[9px] font-light uppercase tracking-widest border transition-all ${
                             item.estado === 'VIGENTE' 
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/20 shadow-sm shadow-emerald-500/5' 
+                              ? 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-900/20 shadow-sm shadow-blue-500/5' 
                               : 'bg-red-50 text-red-700 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/20 shadow-sm shadow-red-500/5'
                           }`}>
-                            <div className={`w-1.5 h-1.5 rounded-full mr-2 ${item.estado === 'VIGENTE' ? 'bg-emerald-500' : 'bg-red-500'} animate-pulse`} />
+                            <div className={`w-1.5 h-1.5 rounded-full mr-2 ${item.estado === 'VIGENTE' ? 'bg-blue-500' : 'bg-red-500'} animate-pulse`} />
                             {item.estado}
                           </span>
                         </td>
