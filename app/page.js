@@ -344,7 +344,7 @@ export default function Home() {
                       name="plan" required
                       className="w-full h-11 px-4 pr-12 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all appearance-none cursor-pointer"
                     >
-                      <option value="FREE">FREE - 10 Consultas</option>
+                      <option value="FREE">FREE - 5 Consultas</option>
                       <option value="PROFESSIONAL">PRO - 10,000 Consultas</option>
                       <option value="ENTERPRISE">ENTERPRISE - 1,000,000 Consultas</option>
                     </select>
@@ -631,7 +631,7 @@ export default function Home() {
                                   value={u.plan}
                                   onChange={(e) => handleUpdateUser(u.id, { 
                                     plan: e.target.value, 
-                                    quota_limit: e.target.value === 'ENTERPRISE' ? 1000000 : e.target.value === 'PROFESSIONAL' ? 10000 : 10, 
+                                    quota_limit: e.target.value === 'ENTERPRISE' ? 1000000 : e.target.value === 'PROFESSIONAL' ? 10000 : 5, 
                                     active: u.active, 
                                     role: u.role,
                                     payment_status: u.payment_status 
@@ -925,7 +925,7 @@ export default function Home() {
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {[
-                    { name: 'Free', price: '0', limit: '10', features: ['10 Consultas Únicas', 'Acceso portal', 'Soporte email'] },
+                    { name: 'Free', price: '0', limit: '5', features: ['5 Consultas Únicas', 'Acceso portal', 'Soporte email'] },
                     { name: 'Professional', price: '49', limit: '10,000', features: ['10k Consultas RUC', 'Exportación Excel/CSV', 'API Key dedicada', 'Soporte prioritario'] },
                     { name: 'Enterprise', price: '199', limit: '1,000,000', features: ['Consultas Ilimitadas*', 'Conexión Directa DB', 'Analítica avanzada', 'SLA 99.9%', 'Manager dedicado'] },
                   ].map((plan, i) => (
