@@ -33,8 +33,8 @@ export async function POST(request) {
         }
 
         let quota_limit = 5;
-        if (plan === 'PROFESSIONAL') quota_limit = 10000;
-        if (plan === 'ENTERPRISE') quota_limit = 1000000;
+        if (plan === 'PROFESSIONAL') quota_limit = 5000;
+        if (plan === 'ENTERPRISE') quota_limit = 20000;
 
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 30); // 30 days subscription

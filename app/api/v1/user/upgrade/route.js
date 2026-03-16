@@ -22,9 +22,9 @@ export async function POST(request) {
 
         // Map plan to quotas
         const quotas = {
-            'FREE': 100,
-            'PROFESSIONAL': 10000,
-            'ENTERPRISE': 1000000
+            'FREE': 5,
+            'PROFESSIONAL': 5000,
+            'ENTERPRISE': 20000
         };
 
         const quotaLimit = quotas[plan.toUpperCase()] || 100;

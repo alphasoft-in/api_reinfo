@@ -422,8 +422,8 @@ export default function Home() {
                       className="w-full h-11 px-4 pr-12 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-all appearance-none cursor-pointer"
                     >
                       <option value="FREE">FREE - 5 Consultas</option>
-                      <option value="PROFESSIONAL">PRO - 10,000 Consultas</option>
-                      <option value="ENTERPRISE">ENTERPRISE - 1,000,000 Consultas</option>
+                      <option value="PROFESSIONAL">PRO - 5,000 Consultas</option>
+                      <option value="ENTERPRISE">ENTERPRISE - 20,000 Consultas</option>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                       <ChevronDown className="w-3.5 h-4 text-zinc-400" />
@@ -1258,8 +1258,10 @@ export default function Home() {
                              let featureText = f;
                              if (j === 0) {
                                const limitNum = Number((plan.limit || '0').toString().replace(/,/g, ''));
-                               if (limitNum >= 1000000) featureText = "Consultas Ilimitadas*";
-                               else featureText = `${limitNum.toLocaleString()} Consultas Mensuales`;
+                                if (limitNum >= 1000000) featureText = "Consultas Ilimitadas*"; // Logic kept for platform plan if ever unlimited
+                                else if (limitNum === 20000) featureText = "20k Consultas Mensuales";
+                                else if (limitNum === 5000) featureText = "5k Consultas Mensuales";
+                                else featureText = `${limitNum.toLocaleString()} Consultas Mensuales`;
                              }
                              return (
                                <li key={j} className="flex items-center gap-3 text-[12px] text-zinc-600 dark:text-zinc-400 font-light">

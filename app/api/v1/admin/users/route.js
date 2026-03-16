@@ -76,7 +76,7 @@ export async function POST(request) {
                 updates.quota_limit = Number(matchingPlan.limit.replace(/,/g, ''));
             } else {
                 // Fallback
-                const fallbackQuotas = { 'FREE': 5, 'PROFESSIONAL': 10000, 'ENTERPRISE': 1000000 };
+                const fallbackQuotas = { 'FREE': 5, 'PROFESSIONAL': 5000, 'ENTERPRISE': 20000 };
                 updates.quota_limit = fallbackQuotas[updates.plan.toUpperCase()] || 5;
             }
         }
