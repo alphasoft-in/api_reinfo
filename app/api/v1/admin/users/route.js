@@ -43,6 +43,7 @@ export async function GET(request) {
     }
 
     try {
+        await initDb();
         const users = await getAllUsers();
         console.log('Admin API: Fetched', users.length, 'users');
         return NextResponse.json({ success: true, users });
