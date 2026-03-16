@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { getRegistros, countRegistros, getStats, getUserByUsername, getUserByApiKey, updateQuota, logConsulta } from '@/lib/db';
+import { apiCache } from '@/lib/cache';
+
 
 const validateAuth = async (request) => {
     const apiKey = request.headers.get('x-api-key');
@@ -85,8 +87,23 @@ export async function GET(request) {
         if (status === 'vigente') filter.estado = 'VIGENTE';
         if (status === 'suspendido') filter.estado = 'SUSPENDIDO';
 
-        const data = await getRegistros(filter, limit, offset);
-        const filteredCount = await countRegistros(filter);
+        // --- Caching Logic (RUC-based only) ---
+        let data, filteredCount;
+        const cacheKey = ruc ? `ruc_${ruc}` : null;
+        const cached = cacheKey ? apiCache.get(cacheKey) : null;
+
+        if (cached) {
+            data = cached.data;
+            filteredCount = cached.filteredCount;
+        } else {
+            data = await getRegistros(filter, limit, offset);
+            filteredCount = await countRegistros(filter);
+            // Cache only if it's a specific RUC search and results were found
+            if (cacheKey && data.length > 0) {
+                apiCache.set(cacheKey, { data, filteredCount }, 60); // Cache for 60 mins
+            }
+        }
+
         const stats = await getStats();
 
         // Perform Logging and Quota Update for any data retrieval (except superadmins)
