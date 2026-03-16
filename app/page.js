@@ -428,6 +428,8 @@ export default function Home() {
     );
   }
 
+  if (isLoggedIn && !user) return null;
+
   return (
     <div className="flex h-screen bg-[#fcfdfe] dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50 overflow-hidden font-sans selection:bg-zinc-900 selection:text-white">
       {/* Sidebar Interface */}
@@ -560,10 +562,10 @@ export default function Home() {
                 className={`flex items-center gap-3 h-11 px-4 border transition-all outline-none rounded-2xl ${showUserMenu ? 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm' : 'border-transparent hover:bg-white dark:hover:bg-zinc-900'}`}
               >
                 <div className="w-7 h-7 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-[10px] font-light text-white dark:text-zinc-900 uppercase">
-                  {user?.email[0]}
+                  {user?.email?.[0] || user?.username?.[0] || 'U'}
                 </div>
                 <div className="text-left hidden xl:block">
-                   <p className="text-xs font-light leading-none">{user?.email.split('@')[0]}</p>
+                   <p className="text-xs font-light leading-none">{user?.email?.split('@')?.[0] || user?.username || 'Usuario'}</p>
                    <p className="text-[10px] text-zinc-500 font-light uppercase mt-1">
                      {user?.role === 'superadmin' ? 'Sistemas' : 'Cliente'}
                    </p>
@@ -577,7 +579,7 @@ export default function Home() {
                     <p className="text-[10px] font-light text-zinc-400 uppercase tracking-widest mb-2">Identidad</p>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-xs font-light">
-                        {user?.email?.[0].toUpperCase() || 'U'}
+                        {user?.email?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
                       </div>
                       <div className="space-y-0.5">
                         <p className="text-sm font-light truncate max-w-[140px]">{user?.email || 'Sesión Activa'}</p>
