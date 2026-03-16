@@ -619,8 +619,8 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-4">
                            <span className={`inline-flex items-center gap-1.5 text-[10px] font-light ${u.active ? 'text-blue-600' : 'text-zinc-400'}`}>
-                              <div className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-blue-500 animate-pulse' : 'bg-zinc-300'}`} />
-                              {u.active ? 'OPERATIVO' : 'EN PAUSA'}
+                              <div className={`w-1.5 h-1.5 rounded-full ${u.active ? 'bg-blue-500 animate-pulse' : 'bg-red-500'}`} />
+                              {u.active ? 'OPERATIVO' : 'SUSPENDIDO'}
                            </span>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -964,8 +964,8 @@ export default function Home() {
                   <AlertCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-orange-900 dark:text-orange-400">Cuenta en Pausa / Suspendida</h3>
-                  <p className="text-[11px] text-orange-700 dark:text-orange-500 font-light">Su acceso a la API y consultas ha sido restringido temporalmente. Por favor, regularice su pago o cambie de plan para continuar.</p>
+                  <h3 className="text-sm font-bold text-orange-900 dark:text-orange-400">Cuenta SUSPENDIDA por Administración</h3>
+                  <p className="text-[11px] text-orange-700 dark:text-orange-500 font-light">Su acceso ha sido bloqueado manualmente por un administrador. Si cree que esto es un error, por favor regularice su situación o contacte a soporte.</p>
                 </div>
                 <button 
                   onClick={() => setActiveTab('planes')}

@@ -36,6 +36,7 @@ export async function GET(request) {
                 quota_limit: user.quota_limit,
                 quota_used: user.quota_used,
                 subscription_end: user.subscription_end,
+                active: user.active,
                 two_factor_enabled: user.two_factor_enabled
             },
             analytics: user.role === 'superadmin' ? {
