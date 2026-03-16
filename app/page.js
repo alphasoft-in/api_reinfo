@@ -88,7 +88,7 @@ export default function Home() {
       
       // Load data and config
       if (user?.role === 'superadmin') {
-        fetchAdminUsers();
+        if (activeTab === 'admin' || activeTab === 'dashboard') fetchAdminUsers();
         fetchPlanes();
         if (activeTab === 'dashboard') fetchData();
       } else {
@@ -100,7 +100,7 @@ export default function Home() {
         }
       }
     }
-  }, [isLoggedIn, page, activeTab, hasSearched]);
+  }, [isLoggedIn, page, activeTab, hasSearched, user?.role]);
 
   const fetchAdminUsers = async () => {
     try {
