@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createUser, getUserByUsername } from '@/lib/db';
+import { createUser, getUserByUsername, addSubscriptionRecord } from '@/lib/db';
 
 export async function POST(request) {
     try {
@@ -54,6 +54,19 @@ export async function POST(request) {
             quota_limit,
             subscription_end: expiryDate.toISOString()
         });
+
+        // Record initial subscription history
+        if (role !== 'superadmin') {
+            const fallbackPrices = { 'FREE': '0', 'PROFESSIONAL': '49', 'ENTERPRISE': '199', 'BASIC': '0' };
+            await addSubscriptionRecord({
+                user_id: id,
+                plan_name: finalPlan.toUpperCase(),
+                amount: fallbackPrices[finalPlan.toUpperCase()] || '0',
+                payment_method: 'Registro Inicial',
+                start_date: new Date().toISOString(),
+                end_date: expiryDate.toISOString()
+            });
+        }
 
         return NextResponse.json({
             success: true,

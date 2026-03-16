@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
-import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser, getPlanes } from '@/lib/db';
+import { getAllUsers, adminUpdateUser, getUserByUsername, initDb, deleteUser, getPlanes, addSubscriptionRecord } from '@/lib/db';
 
 const validateAdmin = async (request) => {
     const authHeader = request.headers.get('authorization');
@@ -65,20 +65,43 @@ export async function POST(request) {
         
         // If we are activating payment and there's a requested plan, apply it
         if (updates.payment_status === 'active' && updates.requested_plan) {
-            updates.plan = updates.requested_plan;
+            const planToActivate = updates.requested_plan;
+            updates.plan = planToActivate;
             updates.requested_plan = null;
             
             // Set quota based on actual plan configuration in DB
             const planesList = await getPlanes();
-            const matchingPlan = planesList.find(p => p.name.toUpperCase() === updates.plan.toUpperCase());
+            const matchingPlan = planesList.find(p => p.name.toUpperCase() === planToActivate.toUpperCase());
+            
+            let quotaLimit = 5;
+            let price = '0';
             
             if (matchingPlan) {
-                updates.quota_limit = Number(matchingPlan.limit.replace(/,/g, ''));
+                quotaLimit = Number(matchingPlan.limit.replace(/,/g, ''));
+                price = matchingPlan.price;
             } else {
                 // Fallback
                 const fallbackQuotas = { 'FREE': 5, 'PROFESSIONAL': 5000, 'ENTERPRISE': 20000 };
-                updates.quota_limit = fallbackQuotas[updates.plan.toUpperCase()] || 5;
+                const fallbackPrices = { 'FREE': '0', 'PROFESSIONAL': '49', 'ENTERPRISE': '199' };
+                quotaLimit = fallbackQuotas[planToActivate.toUpperCase()] || 5;
+                price = fallbackPrices[planToActivate.toUpperCase()] || '0';
             }
+            
+            updates.quota_limit = quotaLimit;
+            
+            // Record in subscription history
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 30); // 30 days standard
+
+            await addSubscriptionRecord({
+                user_id: userId,
+                plan_name: planToActivate,
+                amount: price,
+                payment_method: 'Transferencia/Banca',
+                start_date: startDate.toISOString(),
+                end_date: endDate.toISOString()
+            });
         }
 
         await adminUpdateUser(userId, updates);

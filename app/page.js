@@ -62,6 +62,7 @@ export default function Home() {
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [plansConfig, setPlansConfig] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [subHistory, setSubHistory] = useState([]);
 
   useEffect(() => {
     checkSession();
@@ -92,6 +93,7 @@ export default function Home() {
     if (isLoggedIn) {
       fetchStats();
       fetchUsage();
+      fetchSubHistory();
       
       // Load data and config
       if (user?.role === 'superadmin') {
@@ -161,6 +163,13 @@ export default function Home() {
     try {
       const res = await axios.get("/api/v1/planes");
       if (res.data.success) setPlansConfig(res.data.planes);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchSubHistory = async () => {
+    try {
+      const res = await axios.get("/api/v1/user/subscriptions");
+      if (res.data.success) setSubHistory(res.data.history);
     } catch (err) { console.error(err); }
   };
 
@@ -1403,6 +1412,8 @@ export default function Home() {
                   if (user?.role === 'superadmin') {
                     fetchStats();
                     fetchAdminUsers();
+                  } else {
+                    fetchSubHistory();
                   }
                   if (query || hasSearched) fetchData();
                 }} 
@@ -1458,6 +1469,62 @@ export default function Home() {
               ))
             )}
           </div>
+          
+          {/* Subscription History Table - For Clients in Overview */}
+          {!hasSearched && user?.role !== 'superadmin' && subHistory.length > 0 && (
+            <div className="mt-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+               <div className="px-8 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-900/40">
+                  <div className="flex items-center gap-3">
+                     <CreditCard className="w-4 h-4 text-blue-500" />
+                     <h2 className="text-xs font-light text-zinc-400 uppercase tracking-[0.2em]">Historial de Suscripciones</h2>
+                  </div>
+                  <span className="text-[10px] text-zinc-400 font-light italic px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg">Facturación Corporativa</span>
+               </div>
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                     <thead>
+                        <tr className="border-b border-zinc-50 dark:border-zinc-800/50">
+                           <th className="px-8 py-5 text-[10px] font-light text-zinc-400 uppercase tracking-widest">Plan</th>
+                           <th className="px-8 py-5 text-[10px] font-light text-zinc-400 uppercase tracking-widest">Periodo</th>
+                           <th className="px-8 py-5 text-[10px] font-light text-zinc-400 uppercase tracking-widest text-right">Inversión</th>
+                           <th className="px-8 py-5 text-[10px] font-light text-zinc-400 uppercase tracking-widest text-center">Medio de Pago</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/30">
+                        {subHistory.map((sub, idx) => (
+                           <tr key={idx} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-all duration-300">
+                              <td className="px-8 py-5">
+                                 <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600">
+                                       <Zap className="w-3.5 h-3.5" />
+                                    </div>
+                                    <span className="text-sm font-light text-zinc-900 dark:text-zinc-100">{sub.plan_name}</span>
+                                 </div>
+                              </td>
+                              <td className="px-8 py-5">
+                                 <div className="flex flex-col gap-0.5">
+                                    <span className="text-xs font-light text-zinc-600 dark:text-zinc-400">
+                                       {new Date(sub.start_date).toLocaleDateString()} - {new Date(sub.end_date).toLocaleDateString()}
+                                    </span>
+                                    <span className="text-[9px] text-zinc-400 uppercase tracking-wider">30 Días de Cobertura</span>
+                                 </div>
+                              </td>
+                              <td className="px-8 py-5 text-right font-mono text-sm text-zinc-900 dark:text-zinc-100">
+                                 ${sub.amount}
+                              </td>
+                              <td className="px-8 py-5 text-center">
+                                 <span className="px-3 py-1 bg-green-50 dark:bg-green-900/10 text-green-600 text-[10px] font-light rounded-lg border border-green-100 dark:border-green-900/30">
+                                    {sub.payment_method}
+                                 </span>
+                              </td>
+                           </tr>
+                        ))}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+          )}
+
 
           {/* Master Table - Hidden for regular users until they search */}
           {(user?.role === 'superadmin' || hasSearched) && (
