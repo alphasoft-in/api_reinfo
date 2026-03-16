@@ -45,12 +45,17 @@ export async function GET(request) {
     const { user } = auth;
 
     // Quota and Subscription Check - Universal check for all modes
-    // 1. Plan/Expiry check
+    // 1. Account suspended check
+    if (!user.active) {
+        return NextResponse.json({ success: false, message: 'Cuenta suspendida. Por favor, renueve su suscripción.' }, { status: 403 });
+    }
+
+    // 2. Plan/Expiry check
     if (user.subscription_end && new Date(user.subscription_end) < new Date()) {
         return NextResponse.json({ success: false, message: 'Suscripción expirada' }, { status: 403 });
     }
 
-    // 2. Quota check
+    // 3. Quota check
     if (user.quota_used >= user.quota_limit) {
         return NextResponse.json({ success: false, message: 'Cuota de consultas excedida' }, { status: 403 });
     }

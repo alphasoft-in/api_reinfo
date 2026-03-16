@@ -34,7 +34,7 @@ export async function POST(request) {
             plan: plan.toUpperCase(),
             quota_limit: quotaLimit,
             subscription_end: user.subscription_end, // Keep current or extend
-            active: user.active,
+            active: true, // Reactivate user on upgrade
             role: user.role,
             payment_status: user.payment_status || 'pending'
         });
@@ -42,7 +42,7 @@ export async function POST(request) {
         return NextResponse.json({ 
             success: true, 
             message: `Plan actualizado a ${plan}`,
-            user: { ...user, plan: plan.toUpperCase(), quota_limit: quotaLimit }
+            user: { ...user, plan: plan.toUpperCase(), quota_limit: quotaLimit, active: true }
         });
 
     } catch (error) {

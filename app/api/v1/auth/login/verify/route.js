@@ -51,7 +51,8 @@ export async function POST(request) {
                     limit: user.quota_limit,
                     used: user.quota_used
                 },
-                two_factor_enabled: user.two_factor_enabled
+                two_factor_enabled: user.two_factor_enabled,
+                active: user.active
             }
         });
 

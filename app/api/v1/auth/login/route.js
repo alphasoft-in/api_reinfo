@@ -61,10 +61,6 @@ export async function POST(request) {
             );
         }
 
-        if (!user.active) {
-            return NextResponse.json({ success: false, message: 'Cuenta suspendida' }, { status: 403 });
-        }
-
         // 3. Success: Reset stats and set Session
         await updateLoginStats(user.id, 0, null);
 
@@ -104,7 +100,8 @@ export async function POST(request) {
                     limit: user.quota_limit,
                     used: user.quota_used
                 },
-                two_factor_enabled: user.two_factor_enabled
+                two_factor_enabled: user.two_factor_enabled,
+                active: user.active
             }
         });
 
